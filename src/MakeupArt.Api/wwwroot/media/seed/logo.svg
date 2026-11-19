@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" role="img" aria-labelledby="title">
+  <title id="title">Makeup Art</title>
+  <g fill="none" fill-rule="evenodd">
+    <circle cx="30" cy="32" r="21" stroke="#C9A26B" stroke-width="1.2" opacity=".7"/>
+    <path d="M30 15c7.5 6.7 11 12.4 11 17 0 6.1-4.9 11-11 11s-11-4.9-11-11c0-4.6 3.5-10.3 11-17Z" fill="#8E4A5B"/>
+    <path d="M30 19.5c5 5 7.2 9.1 7.2 12.5a7.2 7.2 0 1 1-14.4 0c0-3.4 2.2-7.5 7.2-12.5Z" fill="#E9C8C1" opacity=".65"/>
+    <path d="M30 24v18M21 33h18" stroke="#FAF6F1" stroke-width=".8" opacity=".5"/>
+    <text x="63" y="31" font-family="Georgia, 'Times New Roman', serif" font-size="22" letter-spacing=".5" fill="#3D2A2F">MAKEUP</text>
+    <text x="63" y="49" font-family="Georgia, 'Times New Roman', serif" font-size="22" letter-spacing=".5" fill="#3D2A2F">ART</text>
+    <text x="152" y="49" font-family="Georgia, 'Times New Roman', serif" font-size="9" letter-spacing="2.4" fill="#8E4A5B">STUDIO</text>
+  </g>
+</svg>

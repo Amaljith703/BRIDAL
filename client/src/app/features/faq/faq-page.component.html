@@ -1,0 +1,136 @@
+<app-page-hero
+  eyebrow="Good to know"
+  title="The details, in one place."
+  subtitle="Bookings, trials, travel, payments and shipping — the questions we are asked most, answered honestly. If yours is not here, send it over and a real person will reply."
+  imageUrl="/media/seed/service-3.jpg"
+  [crumbs]="[{ label: 'Home', url: '/' }, { label: 'FAQ' }]"
+>
+  <a href="#faq" class="btn btn--gold">Browse the questions</a>
+  <a routerLink="/support" class="btn btn--ghost-light">Ask us directly</a>
+</app-page-hero>
+
+<section class="section faq" id="faq">
+  <div class="shell faq__layout">
+    <aside class="faq__aside" appReveal>
+      <span class="eyebrow">Before you book</span>
+      <h2>Ask us<br /><em>anything.</em></h2>
+      <p>
+        The studio inbox is monitored by the team, not an agency. If something is not clear, message us before
+        you pay and we will confirm in writing.
+      </p>
+
+      <div class="faq__promises">
+        @for (promise of promises; track promise.title) {
+          <div class="faq__promise">
+            <app-icon [name]="promise.icon" [size]="17" />
+            <div>
+              <strong>{{ promise.title }}</strong>
+              <small>{{ promise.copy }}</small>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="faq__support-card">
+        <app-icon name="message" [size]="20" />
+        <h3>Still curious?</h3>
+        <p>Raise a support ticket or WhatsApp the studio — we usually reply within a day.</p>
+        <div class="faq__support-actions">
+          <a routerLink="/support" class="btn btn--primary btn--sm">Raise a ticket</a>
+          <a [href]="site.whatsAppUrl()" target="_blank" rel="noopener" class="btn btn--ghost btn--sm">WhatsApp</a>
+        </div>
+      </div>
+    </aside>
+
+    <div class="faq__main">
+      <div class="faq__search" appReveal>
+        <app-icon name="search" [size]="17" />
+        <input
+          type="search"
+          [value]="search()"
+          (input)="applySearch($any($event.target).value)"
+          placeholder="Search a question — advance, travel, returns…"
+          aria-label="Search frequently asked questions"
+        />
+        @if (search()) {
+          <button type="button" (click)="applySearch('')" aria-label="Clear search">
+            <app-icon name="close" [size]="14" />
+          </button>
+        }
+      </div>
+
+      <div class="faq__chips" appReveal>
+        @for (item of categories(); track item) {
+          <button type="button" class="chip" [class.is-active]="category() === item" (click)="setCategory(item)">
+            {{ item }}
+          </button>
+        }
+        @if (search() || category() !== 'All') {
+          <button type="button" class="faq__clear" (click)="clear()">Clear</button>
+        }
+      </div>
+
+      @if (loading()) {
+        <div class="faq__skeleton">
+          @for (item of [1, 2, 3, 4]; track item) {
+            <div class="skeleton faq__skeleton-row"></div>
+          }
+        </div>
+      } @else if (groups().length) {
+        @for (group of groups(); track group.category) {
+          <div class="faq__group" appReveal>
+            <h3 class="faq__group-title">{{ group.category }}</h3>
+            @for (item of group.items; track item.id) {
+              <article class="faq__item" [class.is-open]="open() === item.id">
+                <button
+                  type="button"
+                  class="faq__question"
+                  (click)="toggle(item.id)"
+                  [attr.aria-expanded]="open() === item.id"
+                >
+                  <span>{{ item.question }}</span>
+                  <span class="faq__toggle">
+                    <app-icon [name]="open() === item.id ? 'minus' : 'plus'" [size]="15" />
+                  </span>
+                </button>
+                @if (open() === item.id) {
+                  <p class="faq__answer">{{ item.answer }}</p>
+                }
+              </article>
+            }
+          </div>
+        }
+      } @else {
+        <div class="empty-state">
+          <app-icon name="search" [size]="26" />
+          <h3>No answers match that search</h3>
+          <p>Try a different word, or send the question straight to the studio.</p>
+          <div class="row">
+            <button type="button" class="btn btn--dark btn--sm" (click)="clear()">Show all questions</button>
+            <a routerLink="/support" class="btn btn--ghost btn--sm">Ask the studio</a>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="section section--cream faq-cta">
+  <div class="shell faq-cta__grid">
+    <div class="faq-cta__copy" appReveal>
+      <span class="eyebrow">Ready when you are</span>
+      <h2>The date, the look,<br /><em>the calm morning.</em></h2>
+      <p class="lede">
+        If you have read enough, the next step is a consultation. Bring your inspiration and we will shape the
+        plan around your features, your outfit and your people.
+      </p>
+      <div class="row">
+        <a routerLink="/booking" class="btn btn--primary">Book a consultation</a>
+        <a routerLink="/packages" class="btn btn--ghost">Compare packages</a>
+      </div>
+    </div>
+    <div class="faq-cta__media" appReveal [revealDelay]="100">
+      <img src="/media/seed/hero-bg-2.jpg" alt="A calm studio morning" loading="lazy" />
+    </div>
+  </div>
+</section>

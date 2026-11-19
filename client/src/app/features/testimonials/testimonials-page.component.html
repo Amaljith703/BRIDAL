@@ -1,0 +1,112 @@
+<app-page-hero
+  eyebrow="Love notes"
+  title="What they remember is how they felt."
+  subtitle="Real reflections from brides, editorial clients and lesson students. We keep every note — the nervous mornings, the last-minute changes, the moments when the mirror went quiet."
+  imageUrl="/media/seed/testimonial-1.jpg"
+  [crumbs]="[{ label: 'Home', url: '/' }, { label: 'Love notes' }]"
+>
+  <a href="#notes" class="btn btn--gold">Read the notes</a>
+  <a routerLink="/booking" class="btn btn--ghost-light">Book your morning</a>
+</app-page-hero>
+
+<section class="stats">
+  <div class="shell stats__row">
+    @for (stat of stats(); track stat.label) {
+      <div class="stats__item">
+        <strong>{{ stat.value }}</strong>
+        <span>{{ stat.label }}</span>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="section notes" id="notes">
+  <div class="shell">
+    @if (loading()) {
+      <div class="notes__grid">
+        @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+          <div class="notes__skeleton">
+            <div class="skeleton notes__skeleton-line"></div>
+            <div class="skeleton notes__skeleton-line"></div>
+            <div class="skeleton notes__skeleton-line notes__skeleton-line--short"></div>
+          </div>
+        }
+      </div>
+    } @else {
+      @if (videoStory(); as hero) {
+        <article class="notes__spotlight" appReveal>
+          <button type="button" class="notes__spotlight-media" (click)="play(hero)" aria-label="Play the client film">
+            <img [src]="hero.imageUrl || '/media/seed/testimonial-2.jpg'" [alt]="hero.customerName" />
+            <span class="notes__spotlight-shade" aria-hidden="true"></span>
+            <span class="notes__play"><app-icon name="play" [size]="19" /></span>
+            <span class="notes__spotlight-label">Client film · {{ hero.role || 'Bride' }}</span>
+          </button>
+          <div class="notes__spotlight-copy">
+            <span class="eyebrow">In her words</span>
+            <blockquote>“{{ hero.quote }}”</blockquote>
+            <div class="notes__spotlight-author">
+              <strong>{{ hero.customerName }}</strong>
+              <span>{{ hero.role || 'Bridal client' }} · {{ hero.rating }}★</span>
+            </div>
+            <button type="button" class="btn btn--primary btn--sm" (click)="play(hero)">
+              <app-icon name="play" [size]="14" /> Watch the film
+            </button>
+          </div>
+        </article>
+      }
+
+      <div class="notes__grid">
+        @for (note of written(); track note.id; let i = $index) {
+          <div appReveal [revealDelay]="(i % 3) * 70">
+            <app-testimonial-card [item]="note" (play)="play($event)" />
+          </div>
+        }
+      </div>
+
+      @if (!items().length) {
+        <div class="empty-state">
+          <app-icon name="heart" [size]="28" />
+          <h3>The love notes are being gathered</h3>
+          <p>We are curating recent client stories. In the meantime, the studio is happy to share references privately.</p>
+          <a routerLink="/contact" class="btn btn--dark btn--sm">Ask for references</a>
+        </div>
+      }
+    }
+  </div>
+</section>
+
+<section class="section section--cream share">
+  <div class="shell share__grid">
+    <div class="share__media" appReveal>
+      <img src="/media/seed/testimonial-3.jpg" alt="A quiet moment after the mirror" loading="lazy" appImgFallback />
+      <div class="share__badge">
+        <app-icon name="heart" [size]="16" />
+        <span>
+          <strong>Yours to keep</strong>
+          <small>Every note is shared with permission</small>
+        </span>
+      </div>
+    </div>
+    <div class="share__copy" appReveal [revealDelay]="120">
+      <span class="eyebrow">Your turn</span>
+      <h2>Had your morning<br /><em>with us?</em></h2>
+      <p class="lede">
+        We would love to hear how the look wore through the day — the photographs, the compliments, the
+        touch-ups that worked. Your note helps the next person feel brave about booking.
+      </p>
+      <div class="share__actions">
+        <a routerLink="/support" class="btn btn--primary">Share your story</a>
+        <a routerLink="/contact" class="btn btn--ghost">Send a note</a>
+      </div>
+      <div class="share__reviews">
+        <app-icon name="star" [size]="14" />
+        <span>Product reviews are separate — leave one from your account after an order.</span>
+        <a routerLink="/account/reviews" class="link-arrow">My reviews <app-icon name="arrow-right" [size]="12" /></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+@if (lightbox(); as item) {
+  <app-media-lightbox [item]="item" (close)="lightbox.set(null)" />
+}

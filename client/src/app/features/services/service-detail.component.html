@@ -1,0 +1,143 @@
+@if (loading()) {
+  <div class="page-loading">
+    <span class="spinner"></span>
+    <span>Opening the service…</span>
+  </div>
+} @else if (notFound() || !service()) {
+  <section class="section">
+    <div class="shell empty-state">
+      <app-icon name="brush" [size]="30" />
+      <h1>That ritual is no longer on the menu</h1>
+      <p>The studio may have renamed or retired it. Browse the current menu or ask us for a recommendation.</p>
+      <div class="row">
+        <a routerLink="/services" class="btn btn--primary">See all services</a>
+        <a routerLink="/contact" class="btn btn--ghost">Ask the studio</a>
+      </div>
+    </div>
+  </section>
+} @else {
+  @let item = service()!;
+
+  <app-page-hero
+    [eyebrow]="item.categoryName || 'Studio ritual'"
+    [title]="item.name"
+    [subtitle]="item.shortDescription || null"
+    [imageUrl]="item.imageUrl || null"
+    [crumbs]="crumbs()"
+    [compact]="true"
+  >
+    <a [routerLink]="['/booking']" [queryParams]="{ service: item.id }" class="btn btn--gold">Book this ritual</a>
+    <button type="button" class="btn btn--ghost-light" (click)="addToBag()">Add to bag</button>
+  </app-page-hero>
+
+  <section class="section detail">
+    <div class="shell detail__grid">
+      <div class="detail__main">
+        <div class="detail__intro" appReveal>
+          <span class="eyebrow">The experience</span>
+          <h2>What the session<br /><em>feels like.</em></h2>
+          @if (item.description) {
+            <div class="detail__copy" [innerHTML]="item.description | safeHtml"></div>
+          } @else {
+            <p class="lede">
+              A considered, unhurried session shaped around your features. We begin with skin prep, build
+              colour in thin layers, and finish with a setting routine that keeps the look luminous for the
+              whole day.
+            </p>
+          }
+        </div>
+
+        <div class="detail__includes" appReveal>
+          <h3>Every booking includes</h3>
+          <ul>
+            @for (line of additions; track line.label) {
+              <li>
+                <span class="detail__check"><app-icon name="check" [size]="13" /></span>
+                <div>
+                  <strong>{{ line.label }}</strong>
+                  <p>{{ line.note }}</p>
+                </div>
+              </li>
+            }
+          </ul>
+        </div>
+
+        <div class="detail__prep" appReveal>
+          <span class="eyebrow">Come as you are</span>
+          <h3>Before your appointment</h3>
+          <ul class="detail__prep-list">
+            @for (line of prep; track line) {
+              <li><app-icon name="check" [size]="13" /> {{ line }}</li>
+            }
+          </ul>
+        </div>
+      </div>
+
+      <aside class="detail__aside">
+        <div class="detail__booking" appReveal>
+          <span class="detail__booking-label">From the studio menu</span>
+          <span class="price detail__price">{{ item.price | inr }}</span>
+          @if (item.compareAtPrice) {
+            <del>{{ item.compareAtPrice | inr }}</del>
+          }
+          <dl class="detail__facts">
+            <div>
+              <dt><app-icon name="clock" [size]="14" /> Duration</dt>
+              <dd>{{ item.durationMinutes | duration }}</dd>
+            </div>
+            <div>
+              <dt><app-icon name="tag" [size]="14" /> Category</dt>
+              <dd>{{ item.categoryName || 'Studio service' }}</dd>
+            </div>
+            <div>
+              <dt><app-icon name="map-pin" [size]="14" /> Where</dt>
+              <dd>In studio or on location</dd>
+            </div>
+            <div>
+              <dt><app-icon name="shield" [size]="14" /> Products</dt>
+              <dd>Professional, patch-tested kit</dd>
+            </div>
+          </dl>
+          <a [routerLink]="['/booking']" [queryParams]="{ service: item.id }" class="btn btn--primary btn--block">
+            Check availability
+          </a>
+          <button type="button" class="btn btn--ghost btn--block" (click)="addToBag()">
+            <app-icon name="bag" [size]="15" /> Add to bag
+          </button>
+          <p class="detail__note">
+            A consultation is included. Travel within Bengaluru is complimentary; outstation travel is quoted
+            separately.
+          </p>
+          <div class="detail__help">
+            <app-icon name="message" [size]="16" />
+            <span>Not sure it’s the right fit?</span>
+            <a routerLink="/support">Ask us</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  @if (related().length) {
+    <section class="section section--cream related">
+      <div class="shell">
+        <div class="section-head" appReveal>
+          <div class="section-head__copy">
+            <span class="eyebrow">You may also love</span>
+            <h2>Pair it with<br /><em>something else.</em></h2>
+          </div>
+          <div class="section-head__actions">
+            <a routerLink="/services" class="link-arrow">Full menu <app-icon name="arrow-right" [size]="14" /></a>
+          </div>
+        </div>
+        <div class="related__grid">
+          @for (line of related(); track line.id; let i = $index) {
+            <div appReveal [revealDelay]="i * 80">
+              <app-service-card [service]="line" />
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+}

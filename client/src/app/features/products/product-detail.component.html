@@ -1,0 +1,267 @@
+﻿@if (loading()) {
+  <div class="page-loading">
+    <span class="spinner"></span>
+    <span>Opening the productâ€¦</span>
+  </div>
+} @else if (notFound() || !product()) {
+  <section class="section">
+    <div class="shell empty-state">
+      <app-icon name="bag" [size]="30" />
+      <h1>That product has left the edit</h1>
+      <p>It may be sold out or retired. Browse the current edit or ask an artist for a close alternative.</p>
+      <div class="row">
+        <a routerLink="/products" class="btn btn--primary">Shop the edit</a>
+        <a routerLink="/support" class="btn btn--ghost">Ask an artist</a>
+      </div>
+    </div>
+  </section>
+} @else {
+  @let item = product()!;
+
+  <section class="product">
+    <div class="shell product__crumbs">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        @for (crumb of crumbs(); track crumb.label; let last = $last) {
+          @if (crumb.url && !last) {
+            <a [routerLink]="crumb.url">{{ crumb.label }}</a>
+            <span>/</span>
+          } @else {
+            <span class="breadcrumb__current">{{ crumb.label }}</span>
+          }
+        }
+      </nav>
+    </div>
+
+    <div class="shell product__grid">
+      <div class="product__gallery">
+        <div class="product__stage">
+          <img [src]="currentImage()" [alt]="item.name" appImgFallback />
+          @if (item.isNewArrival) {
+            <span class="product__flag">New in</span>
+          }
+          @if (savings()) {
+            <span class="product__flag product__flag--sale">Save {{ savings() | inr }}</span>
+          }
+        </div>
+        <div class="product__thumbs">
+          @for (image of images(); track image.id; let i = $index) {
+            <button type="button" [class.is-active]="gallery() === i" (click)="gallery.set(i)" [attr.aria-label]="'View image ' + (i + 1)">
+              <img [src]="image.url" [alt]="image.altText || item.name" loading="lazy" appImgFallback />
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="product__info">
+        <span class="eyebrow">{{ item.categoryName || 'The studio edit' }}</span>
+        <h1>{{ item.name }}</h1>
+        <div class="product__rating">
+          <app-rating-stars [rating]="item.ratingAverage" />
+          <span>{{ item.ratingAverage.toFixed(1) }} Â· {{ item.ratingCount }} reviews</span>
+          @if (item.brand) {
+            <span class="product__brand">by {{ item.brand }}</span>
+          }
+        </div>
+
+        <div class="product__price-row">
+          <span class="price product__price">{{ activePrice() | inr }}</span>
+          @if (item.compareAtPrice) {
+            <del>{{ item.compareAtPrice | inr }}</del>
+          }
+          <span class="product__tax">Inclusive of GST</span>
+        </div>
+
+        @if (item.shortDescription) {
+          <p class="product__lede">{{ item.shortDescription }}</p>
+        }
+
+        @if (item.variants?.length) {
+          <div class="product__variants">
+            <span class="product__label">Shade / size</span>
+            <div class="product__variant-list">
+              @for (option of item.variants; track option.id) {
+                <button
+                  type="button"
+                  class="product__variant"
+                  [class.is-active]="option.id === variant()?.id"
+                  [class.is-out]="option.stockQuantity <= 0"
+                  (click)="selectVariant(option)"
+                >
+                  <span>{{ option.name }}</span>
+                  <small>{{ option.stockQuantity > 0 ? (option.stockQuantity <= 5 ? 'Low stock' : 'In stock') : 'Sold out' }}</small>
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="product__buy">
+          <div class="product__qty">
+            <button type="button" (click)="setQuantity(quantity() - 1)" [disabled]="quantity() <= 1" aria-label="Decrease quantity">
+              <app-icon name="minus" [size]="14" />
+            </button>
+            <span>{{ quantity() }}</span>
+            <button type="button" (click)="setQuantity(quantity() + 1)" [disabled]="quantity() >= stockState().stock" aria-label="Increase quantity">
+              <app-icon name="plus" [size]="14" />
+            </button>
+          </div>
+          <button type="button" class="btn btn--primary product__add" (click)="addToBag()" [disabled]="stockState().stock <= 0">
+            <app-icon name="bag" [size]="16" />
+            {{ stockState().stock <= 0 ? 'Sold out' : 'Add to bag' }}
+          </button>
+        </div>
+        <button type="button" class="btn btn--dark btn--block" (click)="addToBag(true)" [disabled]="stockState().stock <= 0">
+          Buy it now
+        </button>
+
+        <div class="product__stock" [class]="'product__stock--' + stockState().tone">
+          <span class="product__stock-dot" aria-hidden="true"></span>
+          {{ stockState().label }}
+        </div>
+
+        <ul class="product__assurances">
+          <li><app-icon name="truck" [size]="15" /> Free shipping over â‚¹1,499</li>
+          <li><app-icon name="shield" [size]="15" /> Authentic, artist-tested kit</li>
+          <li><app-icon name="refresh" [size]="15" /> 7-day returns on unopened products</li>
+        </ul>
+
+        <div class="product__accordion">
+          @for (entry of accordion; track entry.key) {
+            <article class="product__accordion-item" [class.is-open]="openAccordion() === entry.key">
+              <button type="button" (click)="toggleAccordion(entry.key)">
+                <span>{{ entry.title }}</span>
+                <app-icon [name]="openAccordion() === entry.key ? 'minus' : 'plus'" [size]="14" />
+              </button>
+              @if (openAccordion() === entry.key) {
+                <p>{{ entry.copy }}</p>
+              }
+            </article>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--cream product-story">
+    <div class="shell">
+      <div class="product-story__tabs" appReveal>
+        <button type="button" [class.is-active]="tab() === 'story'" (click)="selectTab('story')">The story</button>
+        <button type="button" [class.is-active]="tab() === 'ritual'" (click)="selectTab('ritual')">How we use it</button>
+        <button type="button" [class.is-active]="tab() === 'care'" (click)="selectTab('care')">Care & details</button>
+      </div>
+
+      <div class="product-story__panel" appReveal>
+        @switch (tab()) {
+          @case ('story') {
+            @if (item.description) {
+              <div class="product-story__copy" [innerHTML]="item.description | safeHtml"></div>
+            } @else {
+              <p class="lede">
+                A studio favourite chosen for real skin and long days. Lightweight, buildable and kind to the
+                barrier â€” the kind of product our artists reach for without thinking.
+              </p>
+            }
+          }
+          @case ('ritual') {
+            <ol class="product-story__steps">
+              <li><span>01</span><div><strong>Prep</strong><p>Start on clean, moisturised skin. Let your skincare settle for a minute before application.</p></div></li>
+              <li><span>02</span><div><strong>Apply</strong><p>Use a light hand and build in thin layers. Warm a small amount on the back of your hand first.</p></div></li>
+              <li><span>03</span><div><strong>Set</strong><p>Press â€” do not sweep â€” with a damp sponge or fingertips for a seamless finish.</p></div></li>
+              <li><span>04</span><div><strong>Touch up</strong><p>Blot first, then add a sheer layer. A little goes a long way through the day.</p></div></li>
+            </ol>
+          }
+          @case ('care') {
+            <div class="product-story__care">
+              <div><strong>Storage</strong><p>Keep away from direct sunlight and heat. The studio stores its kit in a cool cabinet.</p></div>
+              <div><strong>Skin</strong><p>Patch-test new products 24 hours before use, especially if you have sensitive or reactive skin.</p></div>
+              <div><strong>SKU</strong><p>{{ item.sku }}{{ item.hsnCode ? ' Â· HSN ' + item.hsnCode : '' }}</p></div>
+              <div><strong>Shipping weight</strong><p>{{ item.weightGrams }} g</p></div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section product-reviews">
+    <div class="shell">
+      <div class="section-head" appReveal>
+        <div class="section-head__copy">
+          <span class="eyebrow">In their words</span>
+          <h2>{{ item.ratingCount }} verified<br /><em>love notes.</em></h2>
+        </div>
+        <div class="section-head__actions">
+          @if (auth.isAuthenticated()) {
+            <a routerLink="/account/reviews" class="link-arrow">Write a review <app-icon name="arrow-right" [size]="14" /></a>
+          } @else {
+            <a routerLink="/login" [queryParams]="{ returnUrl: '/account/reviews' }" class="link-arrow">
+              Sign in to review <app-icon name="arrow-right" [size]="14" />
+            </a>
+          }
+        </div>
+      </div>
+
+      @if (visibleReviews().length) {
+        <div class="product-reviews__grid">
+          @for (review of visibleReviews(); track review.id; let i = $index) {
+            <article class="product-reviews__card" appReveal [revealDelay]="(i % 3) * 70">
+              <div class="product-reviews__head">
+                <span class="product-reviews__avatar">{{ review.userName.slice(0, 1).toUpperCase() }}</span>
+                <div>
+                  <strong>{{ review.userName }}</strong>
+                  <small>
+                    {{ review.createdAtUtc | dateLabel }}
+                    @if (review.isVerifiedPurchase) {
+                      Â· <app-icon name="verified" [size]="11" /> verified
+                    }
+                  </small>
+                </div>
+                <app-rating-stars [rating]="review.rating" />
+              </div>
+              @if (review.title) {
+                <h3>{{ review.title }}</h3>
+              }
+              <p>{{ review.body }}</p>
+              @if (review.adminResponse) {
+                <div class="product-reviews__reply">
+                  <strong>Studio reply</strong>
+                  <p>{{ review.adminResponse }}</p>
+                </div>
+              }
+            </article>
+          }
+        </div>
+        @if (item.reviews.length > reviewLimit()) {
+          <div class="product-reviews__more">
+            <button type="button" class="btn btn--ghost btn--sm" (click)="showMoreReviews()">Read more reviews</button>
+          </div>
+        }
+      } @else {
+        <p class="muted">No reviews yet. Be the first to tell the studio how it wore through the day.</p>
+      }
+    </div>
+  </section>
+
+  @if (related().length) {
+    <section class="section section--cream related">
+      <div class="shell">
+        <div class="section-head" appReveal>
+          <div class="section-head__copy">
+            <span class="eyebrow">Pairs beautifully with</span>
+            <h2>Complete<br /><em>the ritual.</em></h2>
+          </div>
+          <div class="section-head__actions">
+            <a routerLink="/products" class="link-arrow">All products <app-icon name="arrow-right" [size]="14" /></a>
+          </div>
+        </div>
+        <div class="related__grid">
+          @for (line of related(); track line.id; let i = $index) {
+            <div appReveal [revealDelay]="i * 70">
+              <app-product-card [product]="line" />
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+}

@@ -1,0 +1,107 @@
+<app-page-hero
+  eyebrow="Curated combos"
+  title="Kits that work together."
+  subtitle="A lip, a glow and the thing that holds it all in place — bundled by our artists and priced below the sum of their parts. The easiest way to start a routine that makes sense."
+  imageUrl="/media/seed/category-lips.jpg"
+  [crumbs]="[{ label: 'Home', url: '/' }, { label: 'Combos' }]"
+>
+  <a routerLink="/offers" class="btn btn--gold">See running offers</a>
+  <a href="#combos" class="btn btn--ghost-light">Shop combos</a>
+</app-page-hero>
+
+<section class="combo-strip">
+  <div class="shell combo-strip__row">
+    @for (reason of reasons; track reason.title) {
+      <div class="combo-strip__item">
+        <app-icon [name]="reason.icon" [size]="17" />
+        <div>
+          <strong>{{ reason.title }}</strong>
+          <small>{{ reason.copy }}</small>
+        </div>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="section combos" id="combos">
+  <div class="shell">
+    <div class="combos__bar" appReveal>
+      <div class="section-head__copy">
+        <span class="eyebrow">The bundles</span>
+        <h2>Fewer decisions,<br /><em>better mornings.</em></h2>
+      </div>
+      <form class="combos__search" (submit)="$event.preventDefault(); applySearch(searchInput.value)">
+        <app-icon name="search" [size]="16" />
+        <input
+          #searchInput
+          type="search"
+          [value]="search()"
+          placeholder="Search combos…"
+          aria-label="Search combos"
+        />
+        <button type="submit" class="btn btn--dark btn--sm">Search</button>
+      </form>
+    </div>
+
+    <div class="combos__meta" appReveal>
+      <span>{{ total() }} {{ total() === 1 ? 'combo' : 'combos' }}</span>
+      <span>Bundle pricing applied automatically</span>
+    </div>
+
+    @if (loading()) {
+      <div class="combos__grid">
+        @for (item of [1, 2, 3]; track item) {
+          <div class="combos__skeleton">
+            <div class="skeleton combos__skeleton-media"></div>
+            <div class="skeleton combos__skeleton-line"></div>
+            <div class="skeleton combos__skeleton-line combos__skeleton-line--short"></div>
+          </div>
+        }
+      </div>
+    } @else if (combos().length) {
+      <div class="combos__grid">
+        @for (combo of combos(); track combo.id; let i = $index) {
+          <div appReveal [revealDelay]="(i % 3) * 90">
+            <app-combo-card [item]="combo" />
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="empty-state">
+        <app-icon name="gift" [size]="28" />
+        <h3>No combos match that search</h3>
+        <p>Try a broader word, or shop the full edit and build your own pairing.</p>
+        <div class="row">
+          <button type="button" class="btn btn--dark btn--sm" (click)="applySearch('')">Show all combos</button>
+          <a routerLink="/products" class="btn btn--ghost btn--sm">Shop the edit</a>
+        </div>
+      </div>
+    }
+  </div>
+</section>
+
+@if (offers().length) {
+  <section class="section section--cream offers-tease">
+    <div class="shell offers-tease__grid">
+      <div class="offers-tease__media" appReveal>
+        <img [src]="offers()[0].imageUrl || '/media/seed/package-2.jpg'" [alt]="offers()[0].title" loading="lazy" />
+        <span class="offers-tease__tag">
+          <app-icon name="tag" [size]="14" />
+          {{ offers()[0].discountType === 'Percentage' ? offers()[0].discountValue + '% off' : (offers()[0].discountValue | inr) + ' off' }}
+        </span>
+      </div>
+      <div class="offers-tease__copy" appReveal [revealDelay]="120">
+        <span class="eyebrow">Running now</span>
+        <h2>{{ offers()[0].title }}</h2>
+        <p>{{ offers()[0].subtitle }}</p>
+        @if (offers()[0].code) {
+          <div class="offers-tease__code">
+            <span>Use code</span>
+            <strong>{{ offers()[0].code }}</strong>
+          </div>
+        }
+        <a routerLink="/offers" class="btn btn--primary">See every offer <app-icon name="arrow-right" [size]="14" /></a>
+      </div>
+    </div>
+  </section>
+}

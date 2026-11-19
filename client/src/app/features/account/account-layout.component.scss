@@ -1,0 +1,16 @@
+:host { display: block; color: #3d2a2f; }
+.account-area { min-height: 70vh; padding-block: clamp(34px, 5vw, 64px); }
+.account-head { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 28px; }
+.account-head h1 { margin: 8px 0; font: 400 clamp(2rem, 5vw, 3.1rem)/1.04 Georgia,serif; }
+.account-head h1 em { color: #8e4a5b; font-weight: 400; }
+.account-head .muted { margin: 0; color: #806e72; }
+.eyebrow { margin: 0; color: #8e4a5b; font-size: .68rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+.account-avatar { display: grid; width: 58px; height: 58px; flex: 0 0 auto; place-items: center; border: 1px solid #dfc3c4; border-radius: 50%; background: #f5e9e9; color: #8e4a5b; font: 400 1.5rem Georgia,serif; }
+.account-layout { display: grid; grid-template-columns: 205px minmax(0,1fr); gap: 24px; align-items: start; }
+.account-nav { position: sticky; top: calc(var(--header-height, 76px) + 20px); display: grid; gap: 4px; padding: 10px; border: 1px solid #eadfd9; border-radius: 16px; background: #fffdfb; }
+.account-nav a { padding: 10px 12px; border-radius: 9px; color: #705d61; font-size: .84rem; text-decoration: none; }
+.account-nav a:hover,.account-nav a.is-active { background: #f5eeeb; color: #8e4a5b; }
+.account-nav a.is-active { font-weight: 700; }
+.account-content { min-width: 0; }
+@media(max-width:780px) { .account-layout { grid-template-columns: 1fr; gap: 14px; } .account-nav { position: static; display: flex; overflow-x: auto; gap: 2px; padding: 7px; scrollbar-width: thin; } .account-nav a { flex: 0 0 auto; white-space: nowrap; } }
+@media(max-width:480px) { .account-area { padding-block: 30px; } .account-head { align-items: flex-start; } .account-avatar { width: 44px; height: 44px; } }

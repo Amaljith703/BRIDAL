@@ -1,0 +1,286 @@
+@if (loading()) {
+  <section class="oc">
+    <div class="shell oc-loading">
+      <div class="skeleton oc-loading__hero"></div>
+      <div class="skeleton oc-loading__body"></div>
+    </div>
+  </section>
+} @else if (failed() || !order()) {
+  <section class="oc">
+    <div class="shell oc-missing" appReveal>
+      <span class="oc-missing__icon"><app-icon name="alert" [size]="26" /></span>
+      <span class="eyebrow">Order unavailable</span>
+      <h1>We could not<br /><em>open this order.</em></h1>
+      <p class="lede">
+        It may belong to another account, or the link may be incomplete. Your orders are always listed in your
+        account.
+      </p>
+      <div class="row">
+        <a routerLink="/account/orders" class="btn btn--primary">My orders</a>
+        <a routerLink="/contact" class="btn btn--ghost">Contact the studio</a>
+      </div>
+    </div>
+  </section>
+} @else if (order(); as item) {
+  <section class="oc-hero" [class.is-new]="isNew()">
+    <div class="shell oc-hero__inner" appReveal>
+      <span class="oc-hero__seal"><app-icon name="check" [size]="26" /></span>
+      <span class="eyebrow eyebrow--light">{{ isNew() ? 'Payment received' : 'Order details' }}</span>
+      <h1>
+        @if (isNew()) {
+          It's yours, <em>{{ firstName() }}.</em>
+        } @else {
+          Order <em>{{ item.orderNumber }}</em>
+        }
+      </h1>
+      <p>
+        @if (isNew()) {
+          Thank you for trusting the studio. A confirmation and GST invoice are on their way to
+          <strong>{{ item.customerEmail }}</strong>.
+        } @else {
+          Everything about this order, kept in one place. Save the link or find it again in My Orders.
+        }
+      </p>
+
+      <div class="oc-hero__meta">
+        <button type="button" class="oc-ref" (click)="copyOrderNumber()" title="Copy order number">
+          <span>Order</span>
+          <strong>{{ item.orderNumber }}</strong>
+          <app-icon name="copy" [size]="12" />
+        </button>
+        <span class="oc-meta-chip"><app-icon name="calendar" [size]="13" /> {{ item.createdAtUtc | dateLabel }}</span>
+        <span class="oc-meta-chip"><app-icon name="credit-card" [size]="13" /> {{ item.paymentStatus }}</span>
+        <span class="oc-meta-chip"><app-icon name="package" [size]="13" /> {{ itemCount() }} {{ itemCount() === 1 ? 'piece' : 'pieces' }}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="oc">
+    <div class="shell oc__grid">
+      <div class="oc__main">
+        <div class="oc-status" appReveal>
+          <div class="oc-status__copy">
+            <span class="oc-label">Current status</span>
+            <div class="oc-status__row">
+              <span class="badge" [class]="'badge badge--' + statusTone()">{{ item.status }}</span>
+              <span class="badge" [class]="'badge badge--' + toneFor(item.paymentStatus)">Payment · {{ item.paymentStatus }}</span>
+            </div>
+            <p>
+              @switch (item.status) {
+                @case ('Paid') { Payment is confirmed. The studio is preparing your order now. }
+                @case ('Processing') { The studio is packing or preparing your order with care. }
+                @case ('Shipped') { Your parcel is on its way. Tracking details appear below when available. }
+                @case ('Delivered') { Delivered. We hope every piece feels as lovely in person. }
+                @case ('Cancelled') { This order was cancelled. Any captured payment is refunded to the original method. }
+                @case ('Refunded') { This order has been refunded. Allow 5–7 business days for it to appear. }
+                @default { We are checking the latest status of this order. }
+              }
+            </p>
+          </div>
+          @if (item.trackingNumber) {
+            <div class="oc-status__tracking">
+              <app-icon name="truck" [size]="17" />
+              <div>
+                <small>Tracking number</small>
+                <strong>{{ item.trackingNumber }}</strong>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="oc-card" appReveal>
+          <div class="oc-card__head">
+            <span class="oc-label">What you ordered</span>
+            <span class="oc-card__count">{{ itemCount() }} items</span>
+          </div>
+          <ul class="oc-items">
+            @for (line of item.items; track line.id) {
+              <li>
+                <span class="oc-items__media">
+                  <img [src]="line.imageUrl || '/media/seed/product-1.jpg'" [alt]="line.name" loading="lazy" appImgFallback />
+                </span>
+                <span class="oc-items__copy">
+                  <span class="oc-items__type">{{ line.itemType }}</span>
+                  <strong>{{ line.name }}</strong>
+                  @if (line.variantName) {
+                    <small>{{ line.variantName }}</small>
+                  }
+                  <small>Qty {{ line.quantity }} · {{ line.unitPrice | inr }} each</small>
+                </span>
+                <span class="oc-items__price">{{ line.lineTotal | inr }}</span>
+              </li>
+            }
+          </ul>
+
+          <dl class="oc-totals">
+            <div>
+              <dt>Subtotal</dt>
+              <dd>{{ item.subTotal | inr }}</dd>
+            </div>
+            @if (item.discountAmount > 0) {
+              <div class="is-discount">
+                <dt>Discount @if (item.couponCode) { <span class="badge badge--success">{{ item.couponCode }}</span> }</dt>
+                <dd>−{{ item.discountAmount | inr }}</dd>
+              </div>
+            }
+            <div>
+              <dt>Shipping</dt>
+              <dd>{{ item.shippingAmount === 0 ? 'Free' : (item.shippingAmount | inr) }}</dd>
+            </div>
+            <div>
+              <dt>GST included</dt>
+              <dd>{{ item.taxAmount | inr }}</dd>
+            </div>
+            <div class="oc-totals__grand">
+              <dt>Total {{ item.paymentStatus === 'Captured' ? 'paid' : '' }}</dt>
+              <dd>{{ item.totalAmount | inr }}</dd>
+            </div>
+          </dl>
+
+          @if (item.gstNumber) {
+            <p class="oc-gst"><app-icon name="receipt" [size]="13" /> GSTIN {{ item.gstNumber }} · place of supply {{ item.placeOfSupply || '—' }}</p>
+          }
+        </div>
+
+        <div class="oc-addresses" appReveal>
+          <div class="oc-card">
+            <span class="oc-label">Delivery address</span>
+            @if (shippingAddress(); as address) {
+              <address>
+                <strong>{{ address.fullName }}</strong><br />
+                {{ address.addressLine1 }}<br />
+                @if (address.addressLine2) {
+                  {{ address.addressLine2 }}<br />
+                }
+                {{ address.city }}, {{ address.state }} {{ address.postalCode }}<br />
+                {{ address.country }}<br />
+                <span class="oc-addresses__phone">{{ address.phone }}</span>
+              </address>
+            } @else {
+              <p class="oc-muted">Address details are being finalised.</p>
+            }
+            <span class="oc-addresses__method"><app-icon name="truck" [size]="13" /> {{ item.shippingMethodName }}</span>
+          </div>
+
+          <div class="oc-card">
+            <span class="oc-label">Billing & payment</span>
+            @if (billingAddress(); as billing) {
+              <address>
+                <strong>{{ billing.fullName }}</strong><br />
+                {{ billing.addressLine1 }}<br />
+                @if (billing.addressLine2) {
+                  {{ billing.addressLine2 }}<br />
+                }
+                {{ billing.city }}, {{ billing.state }} {{ billing.postalCode }}
+              </address>
+            } @else {
+              <p class="oc-muted">Billing address same as delivery.</p>
+            }
+            @if (latestPayment(); as payment) {
+              <div class="oc-payment">
+                <span>{{ payment.provider }} · {{ payment.method || 'online' }}</span>
+                <strong>{{ payment.amount | inr }}</strong>
+                @if (payment.providerPaymentId) {
+                  <small>{{ payment.providerPaymentId }}</small>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (item.statusHistory.length) {
+          <div class="oc-card" appReveal>
+            <span class="oc-label">Order timeline</span>
+            <ol class="oc-timeline">
+              @for (event of item.statusHistory; track event.changedAtUtc + event.status) {
+                <li>
+                  <span class="oc-timeline__dot"></span>
+                  <div>
+                    <strong>{{ event.status }}</strong>
+                    <small>{{ event.changedAtUtc | dateLabel }}@if (event.note) { · {{ event.note }}}</small>
+                  </div>
+                </li>
+              }
+            </ol>
+          </div>
+        }
+      </div>
+
+      <aside class="oc__aside">
+        <div class="oc-summary" appReveal>
+          <span class="oc-label">Order summary</span>
+          <div class="oc-summary__status">
+            <span class="badge" [class]="'badge badge--' + statusTone()">{{ item.status }}</span>
+            @if (item.invoiceNumber) {
+              <span class="oc-summary__invoice">{{ item.invoiceNumber }}</span>
+            }
+          </div>
+          <div class="oc-summary__total">
+            <span>Total {{ item.paymentStatus === 'Captured' ? 'paid' : 'due' }}</span>
+            <strong>{{ item.totalAmount | inr }}</strong>
+          </div>
+          @if (item.invoiceNumber) {
+            <button type="button" class="btn btn--dark oc-summary__cta" (click)="downloadInvoice()" [disabled]="invoiceBusy()">
+              @if (invoiceBusy()) {
+                <span class="spinner spinner--sm"></span> Preparing…
+              } @else {
+                <app-icon name="download" [size]="15" /> Download GST invoice
+              }
+            </button>
+          } @else {
+            <p class="oc-summary__note">
+              The GST invoice becomes available as soon as payment is confirmed. We will email a copy too.
+            </p>
+          }
+          <a routerLink="/account/orders" class="btn btn--ghost oc-summary__cta">View all orders</a>
+          <div class="oc-summary__help">
+            <app-icon name="message" [size]="14" />
+            <span>Need help? <a routerLink="/support">Raise a support ticket</a> with this order number.</span>
+          </div>
+        </div>
+
+        <div class="oc-next" appReveal [revealDelay]="90">
+          <span class="eyebrow">What happens next</span>
+          @for (step of nextSteps; track step.title) {
+            <div class="oc-next__item">
+              <span class="oc-next__icon"><app-icon [name]="step.icon" [size]="16" /></span>
+              <div>
+                <strong>{{ step.title }}</strong>
+                <p>{{ step.copy }}</p>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="oc-contact" appReveal [revealDelay]="140">
+          <span class="eyebrow eyebrow--light">The studio</span>
+          <p>Questions about this order? Quote <strong>{{ item.orderNumber }}</strong> and we will find it instantly.</p>
+          <div class="row">
+            @if (site.whatsAppUrl()) {
+              <a [href]="site.whatsAppUrl()" target="_blank" rel="noopener" class="btn btn--gold btn--sm">
+                <app-icon name="whatsapp" [size]="14" /> WhatsApp
+              </a>
+            }
+            <a [href]="'tel:' + site.settings().phone" class="btn btn--ghost-light btn--sm">
+              <app-icon name="phone" [size]="14" /> Call
+            </a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="oc-band">
+    <div class="shell oc-band__inner" appReveal>
+      <div>
+        <span class="eyebrow eyebrow--light">While you are here</span>
+        <h2>Keep the<br /><em>glow going.</em></h2>
+        <p>The studio shop restocks client favourites weekly, and new vlogs are always worth a quiet five minutes.</p>
+      </div>
+      <div class="oc-band__actions">
+        <a routerLink="/products" class="btn btn--gold">Shop the edit</a>
+        <a routerLink="/vlogs" class="btn btn--ghost-light">Watch the vlogs</a>
+      </div>
+    </div>
+  </section>
+}

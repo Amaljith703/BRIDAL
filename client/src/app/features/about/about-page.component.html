@@ -1,0 +1,168 @@
+<app-page-hero
+  eyebrow="The studio"
+  [title]="page()?.title || 'Meet the artist behind the brush'"
+  [subtitle]="page()?.subtitle || 'A studio built on warmth, precision and a love for real skin.'"
+  imageUrl="/media/seed/studio-1.jpg"
+  [crumbs]="[{ label: 'Home', url: '/' }, { label: 'About' }]"
+>
+  <a routerLink="/booking" class="btn btn--gold">Book a consultation</a>
+  <a routerLink="/portfolio" class="btn btn--ghost-light">See the work</a>
+</app-page-hero>
+
+<section class="section story">
+  <div class="shell story__grid">
+    <div class="story__media" appReveal>
+      <figure class="story__main">
+        <img [src]="intro()?.mediaUrl || '/media/seed/about.jpg'" alt="Inside the Makeup Art studio" appImgFallback />
+      </figure>
+      <figure class="story__small">
+        <img src="/media/seed/service-2.jpg" alt="An artist at work" loading="lazy" appImgFallback />
+      </figure>
+      <div class="story__seal">
+        <span>Est.</span>
+        <strong>2014</strong>
+        <span>Bengaluru</span>
+      </div>
+    </div>
+
+    <div class="story__copy" appReveal [revealDelay]="120">
+      <span class="eyebrow">{{ intro()?.eyebrow || 'Our story' }}</span>
+      <h2>{{ intro()?.heading || 'A quiet obsession with light, colour and confidence.' }}</h2>
+      @if (intro()?.bodyHtml) {
+        <div class="story__body" [innerHTML]="intro()!.bodyHtml | safeHtml"></div>
+      } @else {
+        <p class="lede">
+          Makeup Art began in a sunlit Indiranagar apartment with one chair, a kit full of carefully chosen
+          textures, and a belief that getting ready should feel as good as the result. Today our studio works
+          with brides, editorial teams and anyone who wants a look that feels unmistakably theirs.
+        </p>
+      }
+      <div class="story__quote">
+        <app-icon name="sparkles" [size]="17" />
+        <p>“The best compliment is not ‘your makeup is beautiful’. It is ‘you look like you, only rested’.”</p>
+      </div>
+      <a routerLink="/portfolio" class="link-arrow">See recent work <app-icon name="arrow-right" [size]="14" /></a>
+    </div>
+  </div>
+</section>
+
+<section class="numbers">
+  <div class="shell numbers__row">
+    @for (number of numbers; track number.label) {
+      <div class="numbers__item">
+        <strong>{{ number.value }}</strong>
+        <span>{{ number.label }}</span>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="section section--cream values">
+  <div class="shell">
+    <div class="section-head" appReveal>
+      <div class="section-head__copy">
+        <span class="eyebrow">{{ values()?.eyebrow || 'What we care about' }}</span>
+        <h2>{{ values()?.heading || 'Skin first. Always.' }}</h2>
+        @if (values()?.bodyHtml) {
+          <p class="lede">{{ values()!.bodyHtml }}</p>
+        }
+      </div>
+    </div>
+
+    <div class="values__grid">
+      @for (pillar of pillars; track pillar.title; let i = $index) {
+        <article class="values__card" appReveal [revealDelay]="i * 80">
+          <span class="values__icon"><app-icon [name]="pillar.icon" [size]="20" /></span>
+          <h3>{{ pillar.title }}</h3>
+          <p>{{ pillar.copy }}</p>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="section team">
+  <div class="shell">
+    <div class="section-head" appReveal>
+      <div class="section-head__copy">
+        <span class="eyebrow">The hands behind the brush</span>
+        <h2>Four artists,<br /><em>one standard.</em></h2>
+        <p class="lede">
+          Small on purpose. Every artist is trained in-house, works with the same kit philosophy and stays with
+          you from prep to the final photograph.
+        </p>
+      </div>
+    </div>
+
+    <div class="team__grid">
+      @for (person of team; track person.name; let i = $index) {
+        <article class="team__card" appReveal [revealDelay]="i * 80">
+          <div class="team__media">
+            <img [src]="person.image" [alt]="person.name" loading="lazy" appImgFallback />
+          </div>
+          <div class="team__copy">
+            <span>{{ person.role }}</span>
+            <h3>{{ person.name }}</h3>
+            <p>{{ person.copy }}</p>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="studio-tour">
+  <div class="shell studio-tour__inner">
+    <div class="studio-tour__copy" appReveal>
+      <span class="eyebrow eyebrow--light">The room</span>
+      <h2>Warm light,<br /><em>soft music, one chair.</em></h2>
+      <p>
+        The studio is designed for calm: natural light for colour matching, a quiet corner for the people who
+        come with you and a kit cabinet stocked for every undertone. Walk-ins are welcome for product pickups;
+        artistry is by appointment.
+      </p>
+      <div class="studio-tour__actions">
+        <a routerLink="/contact" class="btn btn--gold">Find the studio</a>
+        <a routerLink="/booking" class="btn btn--ghost-light">Reserve a chair</a>
+      </div>
+    </div>
+    <div class="studio-tour__media" appReveal [revealDelay]="120">
+      <img src="/media/seed/studio-1.jpg" alt="The Makeup Art studio interior" loading="lazy" appImgFallback />
+      <div class="studio-tour__caption">
+        <app-icon name="map-pin" [size]="14" />
+        12 Rose Atelier, Indiranagar · Bengaluru
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section press">
+  <div class="shell press__grid">
+    <div class="press__copy" appReveal>
+      <span class="eyebrow">Kind words, elsewhere</span>
+      <h2>Featured in<br /><em>good company.</em></h2>
+    </div>
+    <div class="press__logos" appReveal [revealDelay]="100">
+      <span>Vogue Weddings</span>
+      <span>Brides Today</span>
+      <span>Elle India</span>
+      <span>The Hindu</span>
+      <span>Femina</span>
+      <span>WedMeGood</span>
+    </div>
+  </div>
+</section>
+
+<section class="about-cta">
+  <div class="shell about-cta__inner" appReveal>
+    <div>
+      <span class="eyebrow eyebrow--light">Come say hello</span>
+      <h2>Let’s talk about<br /><em>your morning.</em></h2>
+      <p>Consultations are complimentary and unhurried. Bring your inspiration, your outfit or just your date.</p>
+    </div>
+    <div class="about-cta__actions">
+      <a routerLink="/booking" class="btn btn--gold">Book a consultation</a>
+      <a routerLink="/contact" class="btn btn--ghost-light">Visit the studio</a>
+    </div>
+  </div>
+</section>

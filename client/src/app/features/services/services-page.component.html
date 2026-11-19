@@ -1,0 +1,144 @@
+<app-page-hero
+  eyebrow="The service menu"
+  title="Rituals shaped around you."
+  subtitle="Bridal mornings, editorial shoots, soft glam for the everyday and private lessons that decode the kit. Every service begins with your skin — and ends with a look that still feels like you."
+  imageUrl="/media/seed/service-1.jpg"
+  [crumbs]="[{ label: 'Home', url: '/' }, { label: 'Services' }]"
+>
+  <a routerLink="/booking" class="btn btn--gold">Book a consultation</a>
+  <a routerLink="/packages" class="btn btn--ghost-light">See signature packages</a>
+</app-page-hero>
+
+<section class="section section--tight menu">
+  <div class="shell">
+    <div class="menu__bar" appReveal>
+      <form class="menu__search" (submit)="$event.preventDefault(); applySearch(searchInput.value)">
+        <app-icon name="search" [size]="17" />
+        <input
+          #searchInput
+          type="search"
+          name="search"
+          [value]="search()"
+          placeholder="Search the menu — bridal, lesson, glow…"
+          aria-label="Search services"
+        />
+        <button type="submit" class="btn btn--dark btn--sm">Search</button>
+      </form>
+
+      <label class="menu__sort">
+        <span>Sort</span>
+        <select class="select" [value]="sort()" (change)="setSort($any($event.target).value)">
+          <option value="curated">Curated</option>
+          <option value="price">Price · low to high</option>
+          <option value="price-high">Price · high to low</option>
+          <option value="duration">Shortest first</option>
+          <option value="name">A – Z</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="menu__filters">
+      <button type="button" class="chip" [class.is-active]="category() === 'all'" (click)="setCategory('all')">
+        All rituals
+      </button>
+      @for (item of categories(); track item.id) {
+        <button
+          type="button"
+          class="chip"
+          [class.is-active]="category() === item.slug"
+          (click)="setCategory(item.slug)"
+        >
+          {{ item.name }}
+        </button>
+      }
+      @if (hasFilters()) {
+        <button type="button" class="menu__clear" (click)="clear()">
+          <app-icon name="close" [size]="12" /> Clear
+        </button>
+      }
+      <span class="menu__count">{{ total() }} {{ total() === 1 ? 'ritual' : 'rituals' }}</span>
+    </div>
+
+    @if (loading()) {
+      <div class="menu__grid">
+        @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+          <div class="menu__skeleton">
+            <div class="skeleton menu__skeleton-media"></div>
+            <div class="skeleton menu__skeleton-line"></div>
+            <div class="skeleton menu__skeleton-line menu__skeleton-line--short"></div>
+          </div>
+        }
+      </div>
+    } @else if (services().length) {
+      <div class="menu__grid">
+        @for (service of services(); track service.id; let i = $index) {
+          <div appReveal [revealDelay]="(i % 3) * 80">
+            <app-service-card [service]="service" />
+          </div>
+        }
+      </div>
+
+      @if (totalPages() > 1) {
+        <nav class="pagination" aria-label="Service pages">
+          <button type="button" [disabled]="page() === 1" (click)="goTo(page() - 1)" aria-label="Previous page">
+            <app-icon name="chevron-left" [size]="16" />
+          </button>
+          @for (number of pages(); track number) {
+            <button type="button" [class.is-active]="number === page()" (click)="goTo(number)">{{ number }}</button>
+          }
+          <button
+            type="button"
+            [disabled]="page() === totalPages()"
+            (click)="goTo(page() + 1)"
+            aria-label="Next page"
+          >
+            <app-icon name="chevron-right" [size]="16" />
+          </button>
+        </nav>
+      }
+    } @else {
+      <div class="empty-state">
+        <app-icon name="search" [size]="26" />
+        <h3>No rituals match that search</h3>
+        <p>Try a different word, or clear the filters to see the whole menu.</p>
+        <button type="button" class="btn btn--dark btn--sm" (click)="clear()">Show all services</button>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="section process">
+  <div class="shell">
+    <div class="section-head" appReveal>
+      <div class="section-head__copy">
+        <span class="eyebrow">How it unfolds</span>
+        <h2>Three calm steps,<br /><em>no surprises.</em></h2>
+      </div>
+      <div class="section-head__actions">
+        <a routerLink="/booking" class="link-arrow">Find your date <app-icon name="arrow-right" [size]="14" /></a>
+      </div>
+    </div>
+
+    <div class="process__grid">
+      @for (step of process; track step.title; let i = $index) {
+        <article class="process__card" appReveal [revealDelay]="i * 100">
+          <span class="process__number">0{{ i + 1 }}</span>
+          <span class="process__icon"><app-icon [name]="step.icon" [size]="21" /></span>
+          <h3>{{ step.title }}</h3>
+          <p>{{ step.copy }}</p>
+        </article>
+      }
+    </div>
+
+    <div class="process__foot" appReveal>
+      <div>
+        <strong>Not sure which ritual fits?</strong>
+        <p>Tell us the occasion and we will shape the right plan — no obligation.</p>
+      </div>
+      <div class="row">
+        <a routerLink="/contact" class="btn btn--ghost btn--sm">Ask the studio</a>
+        <a routerLink="/support" class="btn btn--primary btn--sm">Raise a support ticket</a>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,250 @@
+<section class="bag-head">
+  <div class="shell">
+    <nav class="bag-crumbs" aria-label="Breadcrumb">
+      <a routerLink="/">Home</a>
+      <app-icon name="chevron-right" [size]="11" />
+      <span>Your bag</span>
+    </nav>
+    <div class="bag-head__row">
+      <div class="bag-head__copy">
+        <span class="eyebrow">Your bag</span>
+        <h1>The edit,<br /><em>gathered.</em></h1>
+        <p>
+          Rituals, shades and studio time — kept together while you decide. Nothing is reserved until checkout is
+          complete.
+        </p>
+      </div>
+      @if (cart.lines().length) {
+        <div class="bag-head__count" aria-live="polite">
+          <strong>{{ cart.count() }}</strong>
+          <span>{{ cart.count() === 1 ? 'piece' : 'pieces' }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+@if (cart.lines().length === 0) {
+  <section class="bag bag--empty">
+    <div class="shell bag-empty" appReveal>
+      <span class="bag-empty__icon"><app-icon name="bag" [size]="28" /></span>
+      <span class="eyebrow">Nothing here yet</span>
+      <h2>Your bag is<br /><em>waiting.</em></h2>
+      <p class="lede">
+        Browse the studio shop for client-loved products, or reserve a look from the service and package menus.
+      </p>
+      <div class="row bag-empty__actions">
+        <a routerLink="/products" class="btn btn--primary">Shop the edit</a>
+        <a routerLink="/services" class="btn btn--ghost">Browse services</a>
+        <a routerLink="/packages" class="btn btn--ghost">See packages</a>
+      </div>
+      <div class="bag-empty__help">
+        <app-icon name="message" [size]="15" />
+        <span>Not sure what you need? <a routerLink="/contact">Ask the studio</a> — we answer personally.</span>
+      </div>
+    </div>
+  </section>
+} @else {
+  <section class="bag">
+    <div class="shell bag__grid">
+      <div class="bag__main">
+        @if (cart.hasPhysicalItems()) {
+          <div class="bag-ship" [class.is-qualified]="qualifiesForFreeShipping()" appReveal>
+            <div class="bag-ship__row">
+              <span class="bag-ship__icon"><app-icon name="truck" [size]="17" /></span>
+              @if (qualifiesForFreeShipping()) {
+                <p><strong>Free standard shipping unlocked.</strong> Your parcel is dispatched within 24 hours.</p>
+              } @else {
+                <p>
+                  You are <strong>{{ remainingForFreeShipping() | inr }}</strong> away from free standard shipping.
+                </p>
+              }
+              <small>{{ physicalSubtotal() | inr }} / {{ freeShippingThreshold | inr }}</small>
+            </div>
+            <div class="bag-ship__bar" role="progressbar" [attr.aria-valuenow]="shippingProgress()" aria-valuemin="0" aria-valuemax="100">
+              <span [style.width.%]="shippingProgress()"></span>
+            </div>
+          </div>
+        }
+
+        <ul class="bag__lines" aria-label="Bag items">
+          @for (line of cart.lines(); track line.key; let i = $index) {
+            <li class="bag-line" appReveal [revealDelay]="i * 50">
+              <a class="bag-line__media" [routerLink]="linkFor(line)" [attr.aria-label]="line.name">
+                <img [src]="line.imageUrl || '/media/seed/product-1.jpg'" [alt]="line.name" loading="lazy" appImgFallback />
+              </a>
+
+              <div class="bag-line__body">
+                <div class="bag-line__top">
+                  <div class="bag-line__copy">
+                    <span class="bag-line__type">{{ typeLabel(line) }}</span>
+                    <a class="bag-line__name" [routerLink]="linkFor(line)">{{ line.name }}</a>
+                    @if (line.variantName) {
+                      <span class="bag-line__variant">{{ line.variantName }}</span>
+                    }
+                    @if (isBookable(line)) {
+                      <span class="bag-line__note">
+                        <app-icon name="calendar" [size]="12" /> Studio appointment — the team confirms your date after checkout.
+                      </span>
+                    } @else {
+                      <span class="bag-line__note">
+                        <app-icon name="truck" [size]="12" /> Dispatched from the studio within 24 hours.
+                      </span>
+                    }
+                  </div>
+                  <button
+                    type="button"
+                    class="bag-line__remove"
+                    (click)="removeLine(line)"
+                    [attr.aria-label]="'Remove ' + line.name + ' from bag'"
+                  >
+                    <app-icon name="close" [size]="14" />
+                  </button>
+                </div>
+
+                <div class="bag-line__foot">
+                  <div class="bag-stepper" role="group" [attr.aria-label]="'Quantity for ' + line.name">
+                    <button type="button" (click)="bump(line, 'decrement')" [attr.aria-label]="'Decrease quantity of ' + line.name">
+                      <app-icon name="minus" [size]="13" />
+                    </button>
+                    <span aria-live="polite">{{ line.quantity }}</span>
+                    <button
+                      type="button"
+                      (click)="bump(line, 'increment')"
+                      [disabled]="line.quantity >= line.maxQuantity"
+                      [attr.aria-label]="'Increase quantity of ' + line.name"
+                    >
+                      <app-icon name="plus" [size]="13" />
+                    </button>
+                  </div>
+                  <div class="bag-line__prices">
+                    <span class="bag-line__unit">{{ line.unitPrice | inr }} each</span>
+                    <strong>{{ lineTotal(line) | inr }}</strong>
+                  </div>
+                </div>
+                @if (line.quantity >= line.maxQuantity && line.maxQuantity <= 5) {
+                  <small class="bag-line__stock">Only {{ line.maxQuantity }} available — the studio has the rest on order.</small>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+
+        <div class="bag__actions">
+          <a routerLink="/products" class="link-arrow"><app-icon name="arrow-left" [size]="13" /> Continue shopping</a>
+          <button type="button" class="bag__clear" (click)="clearBag()">
+            <app-icon name="trash" [size]="13" /> Empty the bag
+          </button>
+        </div>
+      </div>
+
+      <aside class="bag__aside">
+        <div class="bag-summary" appReveal>
+          <span class="bag-summary__label">Order summary</span>
+          <dl class="bag-summary__rows">
+            <div>
+              <dt>Subtotal</dt>
+              <dd>{{ cart.subtotal() | inr }}</dd>
+            </div>
+            <div>
+              <dt>Shipping</dt>
+              <dd>
+                @if (!cart.hasPhysicalItems()) {
+                  <span class="bag-summary__muted">No shipping needed</span>
+                } @else if (qualifiesForFreeShipping()) {
+                  <span class="bag-summary__free">Free</span>
+                } @else {
+                  {{ estimatedShipping() | inr }}
+                }
+              </dd>
+            </div>
+            <div>
+              <dt>GST</dt>
+              <dd><span class="bag-summary__muted">Included in prices</span></dd>
+            </div>
+          </dl>
+          <div class="bag-summary__total">
+            <span>Estimated total</span>
+            <strong>{{ estimatedTotal() | inr }}</strong>
+          </div>
+          <p class="bag-summary__fine">
+            Taxes are itemised at checkout. Any coupon is applied on the next step.
+          </p>
+          <a routerLink="/checkout" class="btn btn--primary bag-summary__cta">
+            Secure checkout <app-icon name="arrow-right" [size]="15" />
+          </a>
+          @if (!auth.isAuthenticated()) {
+            <p class="bag-summary__signin">
+              <app-icon name="lock" [size]="12" />
+              <span>
+                Sign in to check out — your order, invoice and tracking stay together.
+                <a routerLink="/login" [queryParams]="{ returnUrl: '/checkout' }">Sign in</a> or
+                <a routerLink="/register" [queryParams]="{ returnUrl: '/checkout' }">create an account</a>.
+              </span>
+            </p>
+          }
+          <ul class="bag-summary__trust">
+            <li><app-icon name="shield" [size]="13" /> Razorpay secured · UPI, cards, netbanking</li>
+            <li><app-icon name="refresh" [size]="13" /> 7-day returns on unopened products</li>
+            <li><app-icon name="receipt" [size]="13" /> GST invoice with every order</li>
+          </ul>
+          <div class="bag-summary__pay">
+            <span><app-icon name="razorpay" [size]="16" /> Razorpay</span>
+            <span><app-icon name="upi" [size]="16" /> UPI</span>
+            <span><app-icon name="credit-card" [size]="16" /> Cards</span>
+          </div>
+        </div>
+
+        <div class="bag-help" appReveal [revealDelay]="90">
+          <span class="eyebrow">Need a hand?</span>
+          <p>Message the studio about shades, delivery dates or a booking question.</p>
+          <div class="bag-help__actions">
+            @if (site.whatsAppUrl()) {
+              <a [href]="site.whatsAppUrl()" target="_blank" rel="noopener" class="btn btn--ghost btn--sm">
+                <app-icon name="whatsapp" [size]="14" /> WhatsApp
+              </a>
+            }
+            <a [href]="'tel:' + site.settings().phone" class="btn btn--ghost btn--sm">
+              <app-icon name="phone" [size]="14" /> Call
+            </a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+}
+
+<section class="bag-perks">
+  <div class="shell bag-perks__row">
+    @for (perk of perks; track perk.title; let i = $index) {
+      <div class="bag-perks__item" appReveal [revealDelay]="i * 60">
+        <span class="bag-perks__icon"><app-icon [name]="perk.icon" [size]="17" /></span>
+        <div>
+          <strong>{{ perk.title }}</strong>
+          <small>{{ perk.copy }}</small>
+        </div>
+      </div>
+    }
+  </div>
+</section>
+
+@if (suggestions().length) {
+  <section class="section section--cream bag-more">
+    <div class="shell">
+      <div class="section-head" appReveal>
+        <div class="section-head__copy">
+          <span class="eyebrow">While you are here</span>
+          <h2>Loved alongside<br /><em>your edit.</em></h2>
+        </div>
+        <div class="section-head__actions">
+          <a routerLink="/products" class="link-arrow">Shop all products <app-icon name="arrow-right" [size]="13" /></a>
+        </div>
+      </div>
+      <div class="bag-more__grid">
+        @for (product of suggestions(); track product.id) {
+          <app-product-card [product]="product" />
+        }
+      </div>
+    </div>
+  </section>
+}

@@ -1,0 +1,19 @@
+<div class="admin-shell">
+  <a class="skip-link" href="#admin-content">Skip to admin content</a>
+  <aside class="admin-sidebar">
+    <a routerLink="/admin" class="admin-brand" aria-label="Makeup Art studio desk">
+      <span class="brand-mark">MA</span><span><strong>Makeup Art</strong><small>Studio desk</small></span>
+    </a>
+    <nav aria-label="Studio desk">
+      @for (item of visibleItems(); track item.path) {
+        <a [routerLink]="item.path" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: !!item.exact }">{{ item.label }}</a>
+      }
+    </nav>
+    <div class="sidebar-foot">
+      <a routerLink="/" class="store-link">View storefront</a>
+      <button type="button" (click)="signOut()">Sign out</button>
+      <small>{{ auth.user()?.displayName }}</small>
+    </div>
+  </aside>
+  <main id="admin-content" class="admin-content" tabindex="-1"><router-outlet /></main>
+</div>

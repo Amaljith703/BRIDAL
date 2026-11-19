@@ -1,0 +1,62 @@
+<section class="admin-page section">
+  <div class="shell">
+    <header class="admin-head">
+      <div>
+        <p class="eyebrow">Studio desk</p>
+        <h1>Good work, <em>in view.</em></h1>
+        <p class="muted">A live read of orders, studio activity and the work waiting for your team.</p>
+      </div>
+      <button type="button" class="btn btn--ghost" (click)="load()" [disabled]="loading()">
+        <app-icon name="refresh" [size]="16" /> {{ loading() ? 'Refreshing…' : 'Refresh' }}
+      </button>
+    </header>
+
+    @if (error()) {
+      <div class="notice--error" role="alert">{{ error() }}</div>
+    }
+
+    @if (dashboard(); as data) {
+      <div class="metric-grid">
+        <article class="metric-card metric-card--featured"><span>Revenue today</span><strong>{{ data.revenueToday | inr }}</strong><small>{{ data.revenue7d | inr }} in the last 7 days</small></article>
+        <article class="metric-card"><span>Orders this month</span><strong>{{ data.orders30d }}</strong><small>{{ data.ordersToday }} today</small></article>
+        <article class="metric-card"><span>Average order value</span><strong>{{ data.averageOrderValue | inr }}</strong><small>Paid orders · last 30 days</small></article>
+        <article class="metric-card"><span>Customers</span><strong>{{ data.totalCustomers }}</strong><small>+{{ data.newCustomers30d }} this month</small></article>
+      </div>
+
+      <div class="work-grid" aria-label="Work needing attention">
+        <a routerLink="/admin/orders" class="work-card"><app-icon name="bag" [size]="19" /><span><strong>{{ data.pendingOrders }}</strong><small>Orders to review</small></span></a>
+        <a routerLink="/admin/catalog/products" class="work-card"><app-icon name="sparkles" [size]="19" /><span><strong>{{ data.lowStockCount }}</strong><small>Low stock items</small></span></a>
+        <a routerLink="/admin/bookings" class="work-card"><app-icon name="calendar" [size]="19" /><span><strong>{{ data.pendingBookings }}</strong><small>Booking requests</small></span></a>
+        <a routerLink="/admin/reviews" class="work-card"><app-icon name="star" [size]="19" /><span><strong>{{ data.pendingReviews }}</strong><small>Reviews to moderate</small></span></a>
+        <a routerLink="/admin/tickets" class="work-card"><app-icon name="message" [size]="19" /><span><strong>{{ data.openTickets }}</strong><small>Open support tickets</small></span></a>
+      </div>
+
+      <div class="chart-grid">
+        <article class="chart-card chart-card--wide">
+          <header><div><h2>Revenue</h2><p>Paid orders · last 30 days</p></div><strong>{{ data.revenue30d | inr }}</strong></header>
+          <app-admin-chart [option]="revenueOption()" ariaLabel="Daily revenue for the last 30 days" />
+        </article>
+        <article class="chart-card"><header><div><h2>Order status</h2><p>All orders</p></div></header><app-admin-chart [option]="orderStatusOption()" ariaLabel="Orders grouped by current status" /></article>
+        <article class="chart-card"><header><div><h2>Best sellers</h2><p>Product revenue · last 30 days</p></div></header><app-admin-chart [option]="topProductsOption()" ariaLabel="Top five products by revenue" /></article>
+      </div>
+
+      <div class="bottom-grid">
+        <article class="panel">
+          <div class="panel-head"><div><h2>Latest orders</h2><p>Recently placed with the studio</p></div><a routerLink="/admin/orders">View orders <app-icon name="arrow-right" [size]="14" /></a></div>
+          @if (data.recentOrders.length) {
+            <div class="table-scroll"><table><thead><tr><th>Order</th><th>Customer</th><th>Placed</th><th>Status</th><th class="align-right">Total</th></tr></thead><tbody>
+              @for (order of data.recentOrders; track order.id) {
+                <tr><td><a [routerLink]="['/admin/orders', order.id]">{{ order.orderNumber }}</a></td><td>{{ order.customerName }}</td><td>{{ order.createdAtUtc | dateLabel }}</td><td><span class="status-pill">{{ order.status }}</span></td><td class="align-right">{{ order.totalAmount | inr }}</td></tr>
+              }
+            </tbody></table></div>
+          } @else { <p class="empty-note">New orders will appear here.</p> }
+        </article>
+        <aside class="insight-card"><span class="insight-icon"><app-icon name="sparkles" [size]="19" /></span><p class="eyebrow">Studio note</p><h2>One useful next step</h2><p>{{ data.aiInsight || 'Review the latest activity and follow up where a client is waiting.' }}</p><a routerLink="/admin/assistant">Ask the studio assistant <app-icon name="arrow-right" [size]="14" /></a></aside>
+      </div>
+    } @else if (!loading()) {
+      <div class="empty-state"><h2>Dashboard data is not available yet</h2><p>Check the API connection, then refresh to try again.</p></div>
+    } @else {
+      <div class="loading-state" role="status">Loading studio activity…</div>
+    }
+  </div>
+</section>

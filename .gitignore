@@ -1,0 +1,58 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+TestResults/
+coverage/
+publish/
+*.db
+*.bak
+*.trn
+**/.keys/
+api-build.log
+api-restore.log
+domain-restore.log
+infra-build.log
+restore-diagnostic.log
+
+# Angular / Node
+node_modules/
+client/dist/
+client/.angular/
+npm-debug.log*
+yarn-error.log*
+
+# Runtime data
+logs/
+database/backups/*.bak
+database/backups/*.zip
+src/MakeupArt.Api/wwwroot/media/uploads/
+src/MakeupArt.Api/wwwroot/media/seed/
+!src/MakeupArt.Api/wwwroot/media/seed/
+src/MakeupArt.Api/wwwroot/media/seed/*
+!src/MakeupArt.Api/wwwroot/media/seed/*.jpg
+!src/MakeupArt.Api/wwwroot/media/seed/*.mp3
+!src/MakeupArt.Api/wwwroot/media/seed/logo.svg
+!src/MakeupArt.Api/wwwroot/media/seed/favicon.svg
+!src/MakeupArt.Api/wwwroot/media/seed/vlog-studio.mp4
+!src/MakeupArt.Api/wwwroot/media/seed/MEDIA_ATTRIBUTION.md
+src/MakeupArt.Api/wwwroot/media/seed/src-*.jpg
+src/MakeupArt.Api/wwwroot/media/seed/vlog-[1-6].mp4
+src/MakeupArt.Api/wwwroot/media/seed/music-[1-3].wav
+!database/backups/.gitkeep
+!src/MakeupArt.Api/wwwroot/media/uploads/.gitkeep
+
+# Secrets and environment
+.env
+.env.local
+*.pfx
+secrets.json
+appsettings.Development.local.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+*.swp

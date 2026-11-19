@@ -1,0 +1,274 @@
+﻿<app-page-hero
+  eyebrow="The studio"
+  title="Come say hello."
+  subtitle="Questions, dates, a look you have saved for months â€” send them over. A real person from the studio replies, usually within one working day."
+  imageUrl="/media/seed/studio-1.jpg"
+  [crumbs]="[{ label: 'Home', url: '/' }, { label: 'Contact' }]"
+>
+  <a href="#write" class="btn btn--gold">Send a note</a>
+  <a [href]="site.directionsUrl()" target="_blank" rel="noopener" class="btn btn--ghost-light">
+    <app-icon name="map-pin" [size]="15" /> Get directions
+  </a>
+</app-page-hero>
+
+<section class="contact-strip">
+  <div class="shell contact-strip__row">
+    <a class="contact-strip__item" [href]="'tel:' + site.settings().phone">
+      <span class="contact-strip__icon"><app-icon name="phone" [size]="18" /></span>
+      <span>
+        <small>Call the studio</small>
+        <strong>{{ site.settings().phone }}</strong>
+      </span>
+    </a>
+    <a class="contact-strip__item" [href]="'mailto:' + site.settings().email">
+      <span class="contact-strip__icon"><app-icon name="mail" [size]="18" /></span>
+      <span>
+        <small>Write to us</small>
+        <strong>{{ site.settings().email }}</strong>
+      </span>
+    </a>
+    @if (site.whatsAppUrl()) {
+      <a class="contact-strip__item" [href]="site.whatsAppUrl()" target="_blank" rel="noopener">
+        <span class="contact-strip__icon"><app-icon name="whatsapp" [size]="18" /></span>
+        <span>
+          <small>WhatsApp</small>
+          <strong>Quick questions, answered</strong>
+        </span>
+      </a>
+    }
+    <div class="contact-strip__item">
+      <span class="contact-strip__icon"><app-icon name="clock" [size]="18" /></span>
+      <span>
+        <small>Studio hours</small>
+        <strong>Mon â€“ Sat Â· 9:30 am â€“ 7 pm</strong>
+      </span>
+    </div>
+  </div>
+</section>
+
+<section class="section contact" id="write">
+  <div class="shell contact__grid">
+    <div class="contact__form-wrap" appReveal>
+      <span class="eyebrow">Send a note</span>
+      <h2>Tell us what<br /><em>you have in mind.</em></h2>
+
+      @if (sent()) {
+        <div class="contact__success" role="status">
+          <span class="contact__success-icon"><app-icon name="check" [size]="24" /></span>
+          <h3>Your note is with the studio.</h3>
+          <p>
+            Thank you for writing. We read every message personally and usually reply within one working day.
+            If your date is close, WhatsApp is the quickest way to reach us.
+          </p>
+          <div class="row">
+            <a [href]="site.whatsAppUrl()" target="_blank" rel="noopener" class="btn btn--primary btn--sm">
+              <app-icon name="whatsapp" [size]="14" /> WhatsApp the studio
+            </a>
+            <button type="button" class="btn btn--ghost btn--sm" (click)="sendAnother()">Write another note</button>
+          </div>
+        </div>
+      } @else {
+        <form class="contact__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <div class="contact__row">
+            <label class="field">
+              <span>Your name *</span>
+              <input
+                class="input"
+                type="text"
+                formControlName="name"
+                autocomplete="name"
+                placeholder="Priya Sharma"
+                [class.input--error]="fieldError('name')"
+              />
+              @if (fieldError('name')) {
+                <small class="field-error">{{ fieldError('name') }}</small>
+              }
+            </label>
+            <label class="field">
+              <span>Email *</span>
+              <input
+                class="input"
+                type="email"
+                formControlName="email"
+                autocomplete="email"
+                placeholder="you@example.com"
+                [class.input--error]="fieldError('email')"
+              />
+              @if (fieldError('email')) {
+                <small class="field-error">{{ fieldError('email') }}</small>
+              }
+            </label>
+          </div>
+
+          <div class="contact__row">
+            <label class="field">
+              <span>Phone</span>
+              <input
+                class="input"
+                type="tel"
+                formControlName="phone"
+                autocomplete="tel"
+                placeholder="+91 98765 43210"
+                [class.input--error]="fieldError('phone')"
+              />
+              @if (fieldError('phone')) {
+                <small class="field-error">{{ fieldError('phone') }}</small>
+              }
+            </label>
+            <label class="field">
+              <span>What is this about? *</span>
+              <select class="select" formControlName="subject" [class.select--error]="fieldError('subject')">
+                <option value="" disabled>Choose a subject</option>
+                @for (subject of subjects; track subject) {
+                  <option [value]="subject">{{ subject }}</option>
+                }
+              </select>
+              @if (fieldError('subject')) {
+                <small class="field-error">{{ fieldError('subject') }}</small>
+              }
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Your message *</span>
+            <textarea
+              class="textarea"
+              formControlName="message"
+              rows="6"
+              placeholder="The date, the venue, the look you love â€” anything that helps us picture it."
+              [class.textarea--error]="fieldError('message')"
+            ></textarea>
+            <span class="field-hint">At least 10 characters. {{ form.controls.message.value.length }}/5000</span>
+            @if (fieldError('message')) {
+              <small class="field-error">{{ fieldError('message') }}</small>
+            }
+          </label>
+
+          <div class="contact__submit">
+            <button type="submit" class="btn btn--primary" [disabled]="sending()">
+              @if (sending()) {
+                <span class="spinner spinner--sm"></span> Sendingâ€¦
+              } @else {
+                <app-icon name="send" [size]="15" /> Send your note
+              }
+            </button>
+            <p>We reply personally, usually within one working day. No newsletters unless you ask.</p>
+          </div>
+        </form>
+      }
+    </div>
+
+    <aside class="contact__aside" appReveal [revealDelay]="120">
+      <div class="contact__card">
+        <span class="contact__label">The studio</span>
+        <h3>{{ site.settings().businessName }}</h3>
+        <address>
+          {{ site.settings().addressLine1 }}<br />
+          @if (site.settings().addressLine2) {
+            {{ site.settings().addressLine2 }}<br />
+          }
+          {{ site.settings().city }}, {{ site.settings().state }} {{ site.settings().postalCode }}<br />
+          {{ site.settings().country }}
+        </address>
+        <a [href]="site.directionsUrl()" target="_blank" rel="noopener" class="link-arrow">
+          Open in Maps <app-icon name="arrow-up-right" [size]="13" />
+        </a>
+      </div>
+
+      <div class="contact__card">
+        <span class="contact__label">Studio hours</span>
+        <ul class="contact__hours">
+          @for (entry of hours; track entry.day) {
+            <li>
+              <span>{{ entry.day }}</span>
+              <strong>{{ entry.time }}</strong>
+            </li>
+          }
+        </ul>
+        <p class="contact__small">
+          Wedding-season mornings fill first. If your date is within eight weeks, message us before booking.
+        </p>
+      </div>
+
+      @if (site.socialLinks().length) {
+        <div class="contact__card">
+          <span class="contact__label">Follow the studio</span>
+          <div class="contact__socials">
+            @for (link of site.socialLinks(); track link.id) {
+              <a [href]="link.url" target="_blank" rel="noopener" [attr.aria-label]="link.platform">
+                <app-icon [name]="link.icon || 'globe'" [size]="17" />
+                <span>{{ link.platform }}</span>
+              </a>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="contact__card contact__card--dark">
+        <span class="contact__label">In a hurry?</span>
+        <h3>Reserve a date.</h3>
+        <p>The booking form takes two minutes and holds your slot for review by an artist.</p>
+        <a routerLink="/booking" class="btn btn--gold btn--sm">Book an appointment</a>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section class="section section--cream visit">
+  <div class="shell">
+    <div class="section-head" appReveal>
+      <div class="section-head__copy">
+        <span class="eyebrow">Before you visit</span>
+        <h2>A few practical<br /><em>little things.</em></h2>
+      </div>
+    </div>
+    <div class="visit__grid">
+      @for (note of visitNotes; track note.title; let i = $index) {
+        <article class="visit__card" appReveal [revealDelay]="i * 70">
+          <span class="visit__icon"><app-icon [name]="note.icon" [size]="19" /></span>
+          <h3>{{ note.title }}</h3>
+          <p>{{ note.copy }}</p>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="map-section">
+  <div class="shell">
+    <div class="map-section__head" appReveal>
+      <span class="eyebrow">Find us</span>
+      <h2>Indiranagar,<br /><em>Bengaluru.</em></h2>
+      <p>
+        Tucked above the flower shop on 12th Main. Ring the brass bell â€” someone will always be at the desk
+        during studio hours.
+      </p>
+      <a [href]="site.directionsUrl()" target="_blank" rel="noopener" class="btn btn--dark btn--sm">
+        <app-icon name="map-pin" [size]="14" /> Get directions
+      </a>
+    </div>
+    <div class="map-section__frame" appReveal [revealDelay]="100">
+      <iframe
+        [src]="site.mapEmbedUrl()"
+        title="Makeup Art studio location"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        allowfullscreen
+      ></iframe>
+    </div>
+  </div>
+</section>
+
+<section class="contact-cta">
+  <div class="shell contact-cta__inner" appReveal>
+    <div>
+      <span class="eyebrow eyebrow--light">Ready when you are</span>
+      <h2>The date, the look,<br /><em>the calm morning.</em></h2>
+      <p>Consultations are complimentary and unhurried. Bring your inspiration, your outfit or just your date.</p>
+    </div>
+    <div class="contact-cta__actions">
+      <a routerLink="/booking" class="btn btn--gold">Book a consultation</a>
+      <a routerLink="/faq" class="btn btn--ghost-light">Read the FAQ</a>
+    </div>
+  </div>
+</section>

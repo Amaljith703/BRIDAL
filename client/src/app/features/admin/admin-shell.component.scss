@@ -1,0 +1,20 @@
+:host { display: block; min-height: 100vh; background: #faf6f1; }
+.admin-shell { min-height: 100vh; }
+.skip-link { position: fixed; z-index: 2000; top: -60px; left: 12px; padding: 10px 14px; border-radius: 8px; background: #3d2a2f; color: #fff; }
+.skip-link:focus { top: 12px; }
+.admin-sidebar { position: fixed; inset: 0 auto 0 0; z-index: 50; display: flex; width: 245px; flex-direction: column; padding: 22px 14px 16px; border-right: 1px solid #eadfd9; background: #fffdfb; }
+.admin-brand { display: flex; align-items: center; gap: 11px; padding: 4px 10px 24px; color: #3d2a2f; text-decoration: none; }
+.brand-mark { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 50%; background: #8e4a5b; color: #fff; font: 500 1rem Georgia,serif; }
+.admin-brand strong,.admin-brand small { display: block; }
+.admin-brand strong { font: 500 1.05rem Georgia,serif; }
+.admin-brand small { margin-top: 4px; color: #806e72; font-size: .72rem; }
+.admin-sidebar nav { display: grid; gap: 3px; overflow-y: auto; }
+.admin-sidebar nav a,.sidebar-foot a,.sidebar-foot button { display: block; padding: 9px 11px; border: 0; border-radius: 9px; background: transparent; color: #705d61; font: inherit; font-size: .82rem; text-align: left; text-decoration: none; cursor: pointer; }
+.admin-sidebar nav a:hover,.sidebar-foot a:hover,.sidebar-foot button:hover { background: #f5eeeb; color: #8e4a5b; }
+.admin-sidebar nav a.is-active { background: #f5e9e9; color: #8e4a5b; font-weight: 700; }
+.sidebar-foot { display: grid; gap: 2px; margin-top: auto; padding-top: 14px; border-top: 1px solid #eadfd9; }
+.sidebar-foot small { overflow: hidden; padding: 8px 11px 0; color: #806e72; font-size: .72rem; text-overflow: ellipsis; white-space: nowrap; }
+.admin-content { min-height: 100vh; margin-left: 245px; }
+.admin-content:focus { outline: none; }
+@media (max-width: 900px) { .admin-sidebar { position: sticky; inset: 0 0 auto; width: 100%; height: auto; padding: 10px 14px; border-right: 0; border-bottom: 1px solid #eadfd9; } .admin-brand { padding: 2px 6px 10px; } .brand-mark { width: 34px; height: 34px; } .admin-sidebar nav { grid-auto-columns: max-content; grid-auto-flow: column; grid-template-rows: repeat(2, auto); overflow-x: auto; overflow-y: hidden; padding-bottom: 5px; } .admin-sidebar nav a { white-space: nowrap; } .sidebar-foot { display: flex; align-items: center; gap: 8px; padding-top: 7px; border-top: 0; } .sidebar-foot small { margin-left: auto; padding: 0 8px; } .admin-content { margin-left: 0; } }
+@media (max-width: 560px) { .admin-sidebar nav { grid-template-rows: 1fr; } .sidebar-foot small { display: none; } }

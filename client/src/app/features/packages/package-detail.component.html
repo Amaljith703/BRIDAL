@@ -1,0 +1,170 @@
+@if (loading()) {
+  <div class="page-loading">
+    <span class="spinner"></span>
+    <span>Opening the package…</span>
+  </div>
+} @else if (notFound() || !item()) {
+  <section class="section">
+    <div class="shell empty-state">
+      <app-icon name="package" [size]="30" />
+      <h1>That package is no longer available</h1>
+      <p>It may have been retired or renamed. Browse the current collection or ask the studio to build something bespoke.</p>
+      <div class="row">
+        <a routerLink="/packages" class="btn btn--primary">See all packages</a>
+        <a routerLink="/contact" class="btn btn--ghost">Ask the studio</a>
+      </div>
+    </div>
+  </section>
+} @else {
+  @let pack = item()!;
+
+  <app-page-hero
+    [eyebrow]="pack.occasion || 'Signature package'"
+    [title]="pack.name"
+    [subtitle]="pack.shortDescription || null"
+    [imageUrl]="pack.imageUrl || null"
+    [crumbs]="crumbs()"
+    [compact]="true"
+  >
+    <a routerLink="/booking" [queryParams]="{ package: pack.id }" class="btn btn--gold">Book this package</a>
+    <button type="button" class="btn btn--ghost-light" (click)="addToBag()">Add to bag</button>
+  </app-page-hero>
+
+  <section class="section detail">
+    <div class="shell detail__grid">
+      <div class="detail__main">
+        <div class="detail__intro" appReveal>
+          <span class="eyebrow">The package</span>
+          <h2>Everything from prep<br /><em>to the last photograph.</em></h2>
+          @if (pack.description) {
+            <div class="detail__copy" [innerHTML]="pack.description | safeHtml"></div>
+          } @else {
+            <p class="lede">
+              A complete, unhurried morning shaped around your features and your event. We handle skin prep,
+              colour, hair and draping so you can stay present with the people around you.
+            </p>
+          }
+        </div>
+
+        <div class="detail__includes" appReveal>
+          <div class="detail__section-head">
+            <span class="eyebrow">Inside the package</span>
+            <h3>{{ pack.items.length }} rituals included</h3>
+          </div>
+          @if (pack.items.length) {
+            <ul class="detail__items">
+              @for (line of pack.items; track line.id; let i = $index) {
+                <li>
+                  <span class="detail__item-index">{{ (i + 1).toString().padStart(2, '0') }}</span>
+                  <div class="detail__item-copy">
+                    <strong>{{ line.serviceName }}</strong>
+                    <small>{{ line.quantity > 1 ? line.quantity + ' sessions' : 'One session' }} · styled by a senior artist</small>
+                  </div>
+                  <app-icon name="check" [size]="15" />
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="muted">The studio is updating the inclusions for this package. Ask us for the full breakdown.</p>
+          }
+        </div>
+
+        <div class="detail__timeline" appReveal>
+          <span class="eyebrow">How the journey unfolds</span>
+          <h3>From first message<br /><em>to the morning itself.</em></h3>
+          <ol class="detail__steps">
+            @for (step of timeline; track step.title; let i = $index) {
+              <li>
+                <span class="detail__step-dot">{{ (i + 1).toString().padStart(2, '0') }}</span>
+                <div>
+                  <small>{{ step.time }}</small>
+                  <strong>{{ step.title }}</strong>
+                  <p>{{ step.copy }}</p>
+                </div>
+              </li>
+            }
+          </ol>
+        </div>
+
+        <div class="detail__note" appReveal>
+          <h3>Good to know</h3>
+          <ul>
+            @for (line of note; track line) {
+              <li><app-icon name="check" [size]="13" /> {{ line }}</li>
+            }
+          </ul>
+        </div>
+      </div>
+
+      <aside class="detail__aside">
+        <div class="detail__booking" appReveal>
+          <span class="detail__label">Package from</span>
+          <span class="price detail__price">{{ pack.price | inr }}</span>
+          @if (pack.compareAtPrice) {
+            <div class="detail__saving">
+              <del>{{ pack.compareAtPrice | inr }}</del>
+              @if (savings()) {
+                <span>Save {{ savings() | inr }}</span>
+              }
+            </div>
+          }
+          <dl class="detail__facts">
+            <div>
+              <dt><app-icon name="clock" [size]="14" /> Duration</dt>
+              <dd>{{ pack.durationMinutes | duration }}</dd>
+            </div>
+            <div>
+              <dt><app-icon name="tag" [size]="14" /> Occasion</dt>
+              <dd>{{ pack.occasion || 'All occasions' }}</dd>
+            </div>
+            <div>
+              <dt><app-icon name="map-pin" [size]="14" /> Where</dt>
+              <dd>Studio or your venue</dd>
+            </div>
+            <div>
+              <dt><app-icon name="receipt" [size]="14" /> GST</dt>
+              <dd>18% · invoice included</dd>
+            </div>
+          </dl>
+          <a routerLink="/booking" [queryParams]="{ package: pack.id }" class="btn btn--primary btn--block">
+            Check availability
+          </a>
+          <button type="button" class="btn btn--ghost btn--block" (click)="addToBag()">
+            <app-icon name="bag" [size]="15" /> Add to bag
+          </button>
+          <p class="detail__small">
+            A 30% advance reserves your date. Trial sessions can be added at a preferred rate.
+          </p>
+          <div class="detail__help">
+            <app-icon name="message" [size]="16" />
+            <span>Want to customise it?</span>
+            <a routerLink="/support">Ask us</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  @if (related().length) {
+    <section class="section section--cream related">
+      <div class="shell">
+        <div class="section-head" appReveal>
+          <div class="section-head__copy">
+            <span class="eyebrow">Also consider</span>
+            <h2>Other ways to<br /><em>book the studio.</em></h2>
+          </div>
+          <div class="section-head__actions">
+            <a routerLink="/packages" class="link-arrow">All packages <app-icon name="arrow-right" [size]="14" /></a>
+          </div>
+        </div>
+        <div class="related__grid">
+          @for (line of related(); track line.id; let i = $index) {
+            <div appReveal [revealDelay]="i * 80">
+              <app-package-card [item]="line" />
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+}

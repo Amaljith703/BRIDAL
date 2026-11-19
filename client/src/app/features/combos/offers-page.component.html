@@ -1,0 +1,120 @@
+<app-page-hero
+  eyebrow="Offers & little luxuries"
+  title="A little extra, kindly priced."
+  subtitle="Seasonal offers on services, packages and the studio edit. Copy a code, bring it to checkout, and the discount is applied transparently with GST shown line by line."
+  imageUrl="/media/seed/package-2.jpg"
+  [crumbs]="[{ label: 'Home', url: '/' }, { label: 'Offers' }]"
+>
+  <a href="#offers" class="btn btn--gold">Browse offers</a>
+  <a routerLink="/booking" class="btn btn--ghost-light">Check my date</a>
+</app-page-hero>
+
+<section class="section offers" id="offers">
+  <div class="shell">
+    <div class="offers__head" appReveal>
+      <div class="section-head__copy">
+        <span class="eyebrow">Running now</span>
+        <h2>Good things,<br /><em>while they last.</em></h2>
+      </div>
+      <p class="offers__note">
+        Offers are updated by the studio and reflected live at checkout. If a code does not apply, the cart will
+        tell you exactly why before you pay.
+      </p>
+    </div>
+
+    @if (!offers().length) {
+      <div class="empty-state">
+        <app-icon name="tag" [size]="28" />
+        <h3>No offers running this moment</h3>
+        <p>Join the studio list or follow us on Instagram — new offers are announced there first.</p>
+        <div class="row">
+          <a routerLink="/contact" class="btn btn--dark btn--sm">Join the list</a>
+          <a routerLink="/packages" class="btn btn--ghost btn--sm">Browse packages</a>
+        </div>
+      </div>
+    } @else {
+      @if (featured(); as hero) {
+        <article class="offers__spotlight" appReveal>
+          <div class="offers__spotlight-media">
+            <img [src]="hero.imageUrl || '/media/seed/package-2.jpg'" [alt]="hero.title" />
+          </div>
+          <div class="offers__spotlight-copy">
+            <span class="offers__badge">{{ valueLabel(hero) }}</span>
+            <h3>{{ hero.title }}</h3>
+            <p>{{ hero.subtitle || hero.description }}</p>
+            <ul class="offers__meta">
+              <li><app-icon name="tag" [size]="13" /> {{ appliesLabel(hero) }}</li>
+              <li><app-icon name="calendar" [size]="13" /> {{ validity(hero) }}</li>
+            </ul>
+            @if (hero.code) {
+              <div class="offers__code">
+                <span>{{ hero.code }}</span>
+                <button type="button" (click)="copy(hero.code)">
+                  <app-icon [name]="copied() === hero.code ? 'check' : 'copy'" [size]="13" />
+                  {{ copied() === hero.code ? 'Copied' : 'Copy code' }}
+                </button>
+              </div>
+            }
+            <div class="offers__actions">
+              <a routerLink="/products" class="btn btn--gold btn--sm">Shop the edit</a>
+              <a routerLink="/booking" class="btn btn--ghost-light btn--sm">Book instead</a>
+            </div>
+          </div>
+        </article>
+      }
+
+      @if (rest().length) {
+        <div class="offers__grid">
+          @for (offer of rest(); track offer.id; let i = $index) {
+            <article class="offers__card" appReveal [revealDelay]="(i % 3) * 80">
+              <div class="offers__card-top">
+                <span class="offers__badge">{{ valueLabel(offer) }}</span>
+                <span class="offers__scope">{{ appliesLabel(offer) }}</span>
+              </div>
+              <h3>{{ offer.title }}</h3>
+              <p>{{ offer.subtitle || offer.description }}</p>
+              <ul class="offers__meta">
+                <li><app-icon name="calendar" [size]="13" /> {{ validity(offer) }}</li>
+              </ul>
+              <div class="offers__card-foot">
+                @if (offer.code) {
+                  <button type="button" class="offers__code offers__code--inline" (click)="copy(offer.code)">
+                    <span>{{ offer.code }}</span>
+                    <app-icon [name]="copied() === offer.code ? 'check' : 'copy'" [size]="13" />
+                  </button>
+                } @else {
+                  <span class="muted">Applied automatically</span>
+                }
+                <a [routerLink]="offer.appliesTo === 'Services' || offer.appliesTo === 'Packages' ? '/packages' : '/products'" class="link-arrow">
+                  Use it <app-icon name="arrow-right" [size]="13" />
+                </a>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    }
+  </div>
+</section>
+
+<section class="section section--cream terms">
+  <div class="shell terms__grid">
+    <div class="terms__intro" appReveal>
+      <span class="eyebrow">The fine print</span>
+      <h2>Clear terms,<br /><em>no surprises.</em></h2>
+      <p class="lede">
+        We keep offers simple. If anything is unclear, message the studio before you pay and we will confirm in
+        writing.
+      </p>
+      <a routerLink="/support" class="link-arrow">Ask about an offer <app-icon name="arrow-right" [size]="14" /></a>
+    </div>
+    <ul class="terms__list" appReveal [revealDelay]="120">
+      @for (line of terms; track line; let i = $index) {
+        <li>
+          <span>{{ (i + 1).toString().padStart(2, '0') }}</span>
+          <p>{{ line }}</p>
+        </li>
+      }
+    </ul>
+  </div>
+</section>

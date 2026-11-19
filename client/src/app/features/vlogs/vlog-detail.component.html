@@ -1,0 +1,119 @@
+@if (loading()) {
+  <div class="page-loading">
+    <span class="spinner"></span>
+    <span>Loading the film…</span>
+  </div>
+} @else if (notFound() || !vlog()) {
+  <section class="section">
+    <div class="shell empty-state">
+      <app-icon name="youtube" [size]="30" />
+      <h1>That film has left the channel</h1>
+      <p>It may have been archived. Browse the current channel for recent bridal and studio films.</p>
+      <a routerLink="/vlogs" class="btn btn--primary">Back to the channel</a>
+    </div>
+  </section>
+} @else {
+  @let item = vlog()!;
+
+  <app-page-hero
+    eyebrow="The studio channel"
+    [title]="item.title"
+    [imageUrl]="item.thumbnailUrl || null"
+    [crumbs]="crumbs()"
+    [compact]="true"
+  />
+
+  <section class="section film">
+    <div class="shell">
+      <div class="film__player" appReveal>
+        @if (playing() && item.videoUrl) {
+          <video
+            [src]="item.videoUrl"
+            [poster]="item.thumbnailUrl || ''"
+            controls
+            autoplay
+            playsinline
+          ></video>
+        } @else {
+          <button type="button" class="film__poster" (click)="play()" aria-label="Play the film">
+            <img [src]="item.thumbnailUrl || '/media/seed/vlog-1.jpg'" [alt]="item.title" />
+            <span class="film__poster-shade" aria-hidden="true"></span>
+            <span class="film__poster-play"><app-icon name="play" [size]="24" /></span>
+            <span class="film__poster-duration">{{ item.durationSeconds | videoDuration }}</span>
+          </button>
+        }
+      </div>
+
+      <div class="film__layout">
+        <article class="film__body">
+          <div class="film__meta">
+            <span class="chip is-active">{{ item.type }}</span>
+            <span><app-icon name="user" [size]="13" /> {{ item.influencerName || 'Makeup Art Studio' }}</span>
+            <span><app-icon name="calendar" [size]="13" /> {{ item.publishedAtUtc | dateLabel }}</span>
+            <span><app-icon name="eye" [size]="13" /> {{ item.viewCount }} views</span>
+            <span><app-icon name="clock" [size]="13" /> {{ item.durationSeconds | videoDuration }}</span>
+          </div>
+
+          <h2>About this film</h2>
+          <p class="film__lede">{{ item.description }}</p>
+          <p>
+            Filmed at the Makeup Art studio in Bengaluru. Every look featured is created with professional,
+            patch-tested products and finished with a take-home touch-up plan. If a product catches your eye, it
+            may be available in the studio edit.
+          </p>
+          <div class="film__actions">
+            <a routerLink="/products" class="btn btn--primary btn--sm">Shop the kit</a>
+            <a routerLink="/booking" class="btn btn--ghost btn--sm">Book this look</a>
+            <button type="button" class="btn btn--ghost btn--sm" (click)="share()">
+              <app-icon [name]="copied() ? 'check' : 'copy'" [size]="14" />
+              {{ copied() ? 'Link copied' : 'Share film' }}
+            </button>
+          </div>
+        </article>
+
+        <aside class="film__aside" appReveal>
+          <span class="eyebrow">The artist</span>
+          <div class="film__artist">
+            <span class="film__artist-orb">MA</span>
+            <div>
+              <strong>{{ item.influencerName || 'Aarohi Sen' }}</strong>
+              <small>{{ item.type === 'Influencer' ? 'Guest creator' : 'Senior artist, Makeup Art Studio' }}</small>
+            </div>
+          </div>
+          <p class="film__artist-copy">
+            Twelve years of bridal and editorial artistry, with a skin-first approach and a soft spot for
+            colour that still looks like the person wearing it.
+          </p>
+          <a routerLink="/contact" class="link-arrow">Ask the studio <app-icon name="arrow-right" [size]="13" /></a>
+          <div class="film__aside-note">
+            <app-icon name="info" [size]="15" />
+            <p>Films are added through the studio desk. New episodes are announced on Instagram first.</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  @if (related().length) {
+    <section class="section section--cream related">
+      <div class="shell">
+        <div class="section-head" appReveal>
+          <div class="section-head__copy">
+            <span class="eyebrow">Keep watching</span>
+            <h2>More from<br /><em>the channel.</em></h2>
+          </div>
+          <div class="section-head__actions">
+            <a routerLink="/vlogs" class="link-arrow">All films <app-icon name="arrow-right" [size]="14" /></a>
+          </div>
+        </div>
+        <div class="related__grid">
+          @for (line of related(); track line.id; let i = $index) {
+            <div appReveal [revealDelay]="i * 70">
+              <app-vlog-card [item]="line" />
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+}

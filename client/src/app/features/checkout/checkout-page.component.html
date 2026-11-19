@@ -1,0 +1,598 @@
+<section class="co-head">
+  <div class="shell">
+    <nav class="co-crumbs" aria-label="Breadcrumb">
+      <a routerLink="/">Home</a>
+      <app-icon name="chevron-right" [size]="11" />
+      <a routerLink="/cart">Your bag</a>
+      <app-icon name="chevron-right" [size]="11" />
+      <span>Checkout</span>
+    </nav>
+    <div class="co-head__row">
+      <div class="co-head__copy">
+        <span class="eyebrow">Almost yours</span>
+        <h1>Checkout,<br /><em>calmly.</em></h1>
+        <p>
+          Three short steps. Your details are encrypted in transit and the studio sees only what it needs to pack or
+          prepare your order.
+        </p>
+      </div>
+      <ol class="co-head__steps" aria-label="Checkout progress">
+        <li class="is-done"><span><app-icon name="check" [size]="11" /></span> Bag</li>
+        <li class="is-active"><span>2</span> Details</li>
+        <li><span>3</span> Payment</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="co">
+  <div class="shell co__grid">
+    <div class="co__main">
+      <div class="co-account" appReveal>
+        <span class="co-account__icon"><app-icon name="user" [size]="17" /></span>
+        <div>
+          <small>Signed in as</small>
+          <strong>{{ auth.user()?.email }}</strong>
+        </div>
+        <a routerLink="/account/profile" class="co-account__link">Account <app-icon name="arrow-up-right" [size]="12" /></a>
+      </div>
+
+      <section class="co-card" id="checkout-address" appReveal>
+        <header class="co-card__head">
+          <span class="co-card__num">01</span>
+          <div>
+            <h2>Delivery details</h2>
+            <p>Where the parcel or appointment confirmation should go.</p>
+          </div>
+        </header>
+
+        @if (addresses().length) {
+          <div class="co-addresses">
+            @for (address of addresses(); track address.id) {
+              <button
+                type="button"
+                class="co-address"
+                [class.is-selected]="addressMode() === 'saved' && selectedAddressId() === address.id"
+                (click)="chooseSavedAddress(address)"
+              >
+                <span class="co-address__radio"><span></span></span>
+                <span class="co-address__body">
+                  <span class="co-address__top">
+                    <strong>{{ address.fullName }}</strong>
+                    <span class="badge">{{ address.label }}</span>
+                    @if (address.isDefaultShipping) {
+                      <span class="badge badge--success">Default</span>
+                    }
+                  </span>
+                  <span class="co-address__lines">
+                    {{ address.addressLine1 }}{{ address.addressLine2 ? ', ' + address.addressLine2 : '' }}<br />
+                    {{ address.city }}, {{ address.state }} {{ address.postalCode }}<br />
+                    {{ address.country }} · {{ address.phone }}
+                  </span>
+                </span>
+              </button>
+            }
+            <button
+              type="button"
+              class="co-address co-address--new"
+              [class.is-selected]="addressMode() === 'new'"
+              (click)="useNewAddress()"
+            >
+              <span class="co-address__radio"><span></span></span>
+              <span class="co-address__body">
+                <span class="co-address__top"><strong>Use a new address</strong></span>
+                <span class="co-address__lines">Add a different home, studio or gift address for this order.</span>
+              </span>
+            </button>
+          </div>
+        }
+
+        @if (addressMode() === 'new' || !addresses().length) {
+          <form class="co-form form-grid" [formGroup]="shippingForm" novalidate>
+            <label class="field">
+              <span>Full name *</span>
+              <input
+                class="input"
+                type="text"
+                formControlName="fullName"
+                autocomplete="name"
+                placeholder="Priya Sharma"
+                [class.input--error]="fieldError(shippingForm, 'fullName')"
+              />
+              @if (fieldError(shippingForm, 'fullName')) {
+                <small class="field-error">{{ fieldError(shippingForm, 'fullName') }}</small>
+              }
+            </label>
+            <label class="field">
+              <span>Phone *</span>
+              <input
+                class="input"
+                type="tel"
+                formControlName="phone"
+                autocomplete="tel"
+                placeholder="+91 98765 43210"
+                [class.input--error]="fieldError(shippingForm, 'phone')"
+              />
+              @if (fieldError(shippingForm, 'phone')) {
+                <small class="field-error">{{ fieldError(shippingForm, 'phone') }}</small>
+              }
+            </label>
+            <label class="field span-2">
+              <span>Address line 1 *</span>
+              <input
+                class="input"
+                type="text"
+                formControlName="addressLine1"
+                autocomplete="address-line1"
+                placeholder="Flat / house, building, street"
+                [class.input--error]="fieldError(shippingForm, 'addressLine1')"
+              />
+              @if (fieldError(shippingForm, 'addressLine1')) {
+                <small class="field-error">{{ fieldError(shippingForm, 'addressLine1') }}</small>
+              }
+            </label>
+            <label class="field span-2">
+              <span>Address line 2</span>
+              <input
+                class="input"
+                type="text"
+                formControlName="addressLine2"
+                autocomplete="address-line2"
+                placeholder="Area, landmark (optional)"
+              />
+            </label>
+            <label class="field">
+              <span>City *</span>
+              <input
+                class="input"
+                type="text"
+                formControlName="city"
+                autocomplete="address-level2"
+                placeholder="Bengaluru"
+                [class.input--error]="fieldError(shippingForm, 'city')"
+              />
+              @if (fieldError(shippingForm, 'city')) {
+                <small class="field-error">{{ fieldError(shippingForm, 'city') }}</small>
+              }
+            </label>
+            <label class="field">
+              <span>State *</span>
+              <select class="select" formControlName="state" (change)="refreshQuote()">
+                @for (state of states; track state) {
+                  <option [value]="state">{{ state }}</option>
+                }
+              </select>
+            </label>
+            <label class="field">
+              <span>PIN code *</span>
+              <input
+                class="input"
+                type="text"
+                formControlName="postalCode"
+                autocomplete="postal-code"
+                inputmode="numeric"
+                maxlength="10"
+                placeholder="560038"
+                [class.input--error]="fieldError(shippingForm, 'postalCode')"
+              />
+              @if (fieldError(shippingForm, 'postalCode')) {
+                <small class="field-error">{{ fieldError(shippingForm, 'postalCode') }}</small>
+              }
+            </label>
+            <label class="field">
+              <span>Country *</span>
+              <input class="input" type="text" formControlName="country" autocomplete="country-name" />
+            </label>
+            <label class="field span-2">
+              <span>Address label</span>
+              <input class="input" type="text" formControlName="label" placeholder="Home, Studio, Gift" maxlength="50" />
+            </label>
+          </form>
+        }
+
+        <div class="co-billing">
+          <label class="checkbox">
+            <input type="checkbox" [checked]="billingSame()" (change)="billingSame.set(!billingSame())" />
+            <span>Billing address is the same as delivery.</span>
+          </label>
+
+          @if (!billingSame()) {
+            <div class="co-billing__panel">
+              <div class="co-billing__top">
+                <span class="co-card__label">Billing address</span>
+                <button type="button" class="co-link" (click)="copyShippingToBilling()">Copy delivery address</button>
+              </div>
+              <form class="co-form form-grid" [formGroup]="billingForm" novalidate>
+                <label class="field">
+                  <span>Full name *</span>
+                  <input class="input" type="text" formControlName="fullName" autocomplete="name" />
+                  @if (fieldError(billingForm, 'fullName')) {
+                    <small class="field-error">{{ fieldError(billingForm, 'fullName') }}</small>
+                  }
+                </label>
+                <label class="field">
+                  <span>Phone *</span>
+                  <input class="input" type="tel" formControlName="phone" autocomplete="tel" />
+                  @if (fieldError(billingForm, 'phone')) {
+                    <small class="field-error">{{ fieldError(billingForm, 'phone') }}</small>
+                  }
+                </label>
+                <label class="field span-2">
+                  <span>Address line 1 *</span>
+                  <input class="input" type="text" formControlName="addressLine1" autocomplete="address-line1" />
+                  @if (fieldError(billingForm, 'addressLine1')) {
+                    <small class="field-error">{{ fieldError(billingForm, 'addressLine1') }}</small>
+                  }
+                </label>
+                <label class="field span-2">
+                  <span>Address line 2</span>
+                  <input class="input" type="text" formControlName="addressLine2" autocomplete="address-line2" />
+                </label>
+                <label class="field">
+                  <span>City *</span>
+                  <input class="input" type="text" formControlName="city" autocomplete="address-level2" />
+                  @if (fieldError(billingForm, 'city')) {
+                    <small class="field-error">{{ fieldError(billingForm, 'city') }}</small>
+                  }
+                </label>
+                <label class="field">
+                  <span>State *</span>
+                  <select class="select" formControlName="state">
+                    @for (state of states; track state) {
+                      <option [value]="state">{{ state }}</option>
+                    }
+                  </select>
+                </label>
+                <label class="field">
+                  <span>PIN code *</span>
+                  <input class="input" type="text" formControlName="postalCode" autocomplete="postal-code" />
+                  @if (fieldError(billingForm, 'postalCode')) {
+                    <small class="field-error">{{ fieldError(billingForm, 'postalCode') }}</small>
+                  }
+                </label>
+                <label class="field">
+                  <span>Country *</span>
+                  <input class="input" type="text" formControlName="country" autocomplete="country-name" />
+                </label>
+              </form>
+            </div>
+          }
+        </div>
+
+        <div class="co-gst">
+          <label class="checkbox">
+            <input type="checkbox" [checked]="wantsGst()" (change)="setWantsGst(!wantsGst())" />
+            <span>I need a GST invoice for this order.</span>
+          </label>
+          @if (wantsGst()) {
+            <label class="field co-gst__field">
+              <span>GSTIN *</span>
+              <input
+                class="input"
+                type="text"
+                [formControl]="gstControl"
+                maxlength="15"
+                placeholder="29AABCM1234A1Z5"
+                style="text-transform: uppercase"
+                [class.input--error]="gstControl.touched && gstControl.invalid"
+              />
+              <span class="field-hint">15 characters. The invoice uses your delivery state as the place of supply.</span>
+              @if (gstControl.touched && gstControl.invalid) {
+                <small class="field-error">That GSTIN format does not look right.</small>
+              }
+            </label>
+          }
+        </div>
+      </section>
+
+      @if (cart.hasPhysicalItems()) {
+        <section class="co-card" appReveal>
+          <header class="co-card__head">
+            <span class="co-card__num">02</span>
+            <div>
+              <h2>Delivery method</h2>
+              <p>Physical pieces ship from the studio; digital and studio services need no shipping.</p>
+            </div>
+          </header>
+
+          @if (shippingMethods().length) {
+            <div class="co-shipping">
+              @for (method of shippingMethods(); track method.id) {
+                <button
+                  type="button"
+                  class="co-shipping__option"
+                  [class.is-selected]="selectedShippingId() === method.id"
+                  (click)="chooseShipping(method.id)"
+                >
+                  <span class="co-address__radio"><span></span></span>
+                  <span class="co-shipping__copy">
+                    <strong>{{ method.name }}</strong>
+                    <small>{{ method.description || method.estimatedDays }}</small>
+                    <em>{{ method.estimatedDays }}</em>
+                  </span>
+                  <span class="co-shipping__price">
+                    @if (method.price === 0) {
+                      Free
+                    } @else {
+                      {{ method.price | inr }}
+                    }
+                    @if (method.freeAboveAmount) {
+                      <small>Free above {{ method.freeAboveAmount | inr }}</small>
+                    }
+                  </span>
+                </button>
+              }
+            </div>
+          } @else {
+            <p class="co-muted">Standard studio delivery is applied automatically at the best rate.</p>
+          }
+        </section>
+      }
+
+      <section class="co-card" appReveal>
+        <header class="co-card__head">
+          <span class="co-card__num">{{ cart.hasPhysicalItems() ? '03' : '02' }}</span>
+          <div>
+            <h2>Payment</h2>
+            <p>Choose how you would like to pay. Nothing is charged until you confirm.</p>
+          </div>
+        </header>
+
+        @if (paymentConfig()?.demoMode) {
+          <div class="co-demo">
+            <app-icon name="info" [size]="15" />
+            <p>
+              This preview build uses <strong>demo payments</strong> — no money moves. Razorpay activates automatically
+              once live keys are saved in the admin settings.
+            </p>
+          </div>
+        }
+
+        <div class="co-pay">
+          @for (option of paymentOptions(); track option.value) {
+            <button
+              type="button"
+              class="co-pay__option"
+              [class.is-selected]="selectedPayment() === option.value"
+              (click)="selectedPayment.set(option.value)"
+            >
+              <span class="co-pay__icon"><app-icon [name]="option.icon" [size]="20" /></span>
+              <span class="co-pay__copy">
+                <span class="co-pay__title">
+                  <strong>{{ option.label }}</strong>
+                  @if (option.tag) {
+                    <span class="badge badge--gold">{{ option.tag }}</span>
+                  }
+                </span>
+                <small>{{ option.copy }}</small>
+              </span>
+              <span class="co-address__radio"><span></span></span>
+            </button>
+          }
+        </div>
+
+        @if (paymentConfig() && !paymentOptions().length) {
+          <p class="co-muted" role="status">Payments are temporarily unavailable. Please contact the studio for help.</p>
+        }
+
+        @if (isMock()) {
+          <div class="co-mock">
+            <span class="co-card__label">Simulate a method</span>
+            <div class="co-mock__row">
+              <button
+                type="button"
+                class="co-chip"
+                [class.is-active]="mockMethod() === 'card'"
+                (click)="mockMethod.set('card')"
+              >
+                <app-icon name="credit-card" [size]="14" /> Card
+              </button>
+              <button
+                type="button"
+                class="co-chip"
+                [class.is-active]="mockMethod() === 'upi'"
+                (click)="mockMethod.set('upi')"
+              >
+                <app-icon name="upi" [size]="14" /> UPI
+              </button>
+              <span class="co-mock__note">Captured instantly in development.</span>
+            </div>
+          </div>
+        } @else {
+          <div class="co-secure">
+            <app-icon name="lock" [size]="14" />
+            <span>You will be redirected to Razorpay's secure window. Card details never touch our servers.</span>
+          </div>
+        }
+
+        <label class="field co-notes">
+          <span>Order notes <span class="co-optional">(optional)</span></span>
+          <textarea
+            class="textarea"
+            [formControl]="notesControl"
+            rows="3"
+            placeholder="Gift message, delivery preference, or anything the studio should know."
+          ></textarea>
+          @if (notesControl.touched && notesControl.hasError('maxlength')) {
+            <small class="field-error">Notes are limited to 1,000 characters.</small>
+          }
+        </label>
+      </section>
+
+      <p class="co-terms">
+        By placing this order you agree to the
+        <a routerLink="/terms">terms of service</a>, <a routerLink="/privacy">privacy policy</a>,
+        <a routerLink="/shipping">shipping</a> and <a routerLink="/returns">returns</a> policies.
+      </p>
+    </div>
+
+    <aside class="co__aside">
+      <div class="co-summary" appReveal>
+        <div class="co-summary__head">
+          <span class="co-summary__label">Order summary</span>
+          <span class="co-summary__count">{{ itemCount() }} {{ itemCount() === 1 ? 'piece' : 'pieces' }}</span>
+        </div>
+
+        <ul class="co-summary__lines">
+          @for (line of cart.lines(); track line.key) {
+            <li>
+              <span class="co-summary__thumb">
+                <img [src]="lineImage(line.imageUrl)" [alt]="line.name" loading="lazy" appImgFallback />
+                <span class="co-summary__qty">{{ line.quantity }}</span>
+              </span>
+              <span class="co-summary__line-copy">
+                <strong>{{ line.name }}</strong>
+                @if (line.variantName) {
+                  <small>{{ line.variantName }}</small>
+                }
+              </span>
+              <span class="co-summary__line-price">{{ line.unitPrice * line.quantity | inr }}</span>
+            </li>
+          }
+        </ul>
+
+        <div class="co-coupon">
+          <label class="field">
+            <span>Coupon</span>
+            <div class="co-coupon__row">
+              <input
+                class="input"
+                type="text"
+                [formControl]="couponControl"
+                placeholder="Try GLOW10"
+                autocomplete="off"
+                (keydown.enter)="applyCoupon(); $event.preventDefault()"
+              />
+              <button type="button" class="btn btn--dark btn--sm" (click)="applyCoupon()" [disabled]="quoteLoading()">
+                Apply
+              </button>
+            </div>
+          </label>
+          @if (couponMessage()) {
+            <p class="co-coupon__message" [class.is-good]="couponApplied()">
+              <app-icon [name]="couponApplied() ? 'check' : 'info'" [size]="12" />
+              <span>{{ couponMessage() }}</span>
+              @if (couponApplied()) {
+                <button type="button" class="co-link" (click)="clearCoupon()">Remove</button>
+              }
+            </p>
+          }
+        </div>
+
+        @if (breakdown(); as price) {
+          <dl class="co-summary__totals">
+            <div>
+              <dt>Subtotal</dt>
+              <dd>{{ price.subTotal | inr }}</dd>
+            </div>
+            @if (price.discountAmount > 0) {
+              <div class="is-discount">
+                <dt>Discount @if (quote()?.coupon?.code) { <span class="badge badge--success">{{ quote()?.coupon?.code }}</span> }</dt>
+                <dd>−{{ price.discountAmount | inr }}</dd>
+              </div>
+            }
+            <div>
+              <dt>Shipping</dt>
+              <dd>
+                @if (price.shippingAmount === 0) {
+                  <span class="co-summary__free">Free</span>
+                } @else {
+                  {{ price.shippingAmount | inr }}
+                }
+              </dd>
+            </div>
+            <div>
+              <dt>
+                GST
+                @if (price.pricesIncludeTax) {
+                  <small>included</small>
+                }
+              </dt>
+              <dd>{{ price.taxAmount | inr }}</dd>
+            </div>
+            @if (price.cgstAmount > 0 || price.sgstAmount > 0) {
+              <div class="co-summary__sub">
+                <dt>CGST {{ price.cgstAmount | inr }} · SGST {{ price.sgstAmount | inr }}</dt>
+                <dd></dd>
+              </div>
+            } @else if (price.igstAmount > 0) {
+              <div class="co-summary__sub">
+                <dt>IGST</dt>
+                <dd>{{ price.igstAmount | inr }}</dd>
+              </div>
+            }
+            <div class="co-summary__grand">
+              <dt>Total</dt>
+              <dd>{{ price.totalAmount | inr }}</dd>
+            </div>
+          </dl>
+        } @else {
+          <div class="skeleton co-summary__skeleton"></div>
+        }
+
+        @if (errors().length) {
+          <div class="co-errors" role="alert">
+            <app-icon name="alert" [size]="15" />
+            <ul>
+              @for (error of errors(); track error) {
+                <li>{{ error }}</li>
+              }
+            </ul>
+          </div>
+        }
+
+        @if (pendingOrder(); as pending) {
+          <div class="co-pending">
+            <app-icon name="clock" [size]="15" />
+            <p>
+              <strong>{{ pending.orderNumber }}</strong> is saved. The payment did not complete — retry below or open
+              <a [routerLink]="['/order', pending.orderId]">the order</a>.
+            </p>
+          </div>
+        }
+
+        <button
+          type="button"
+          class="btn btn--primary co-summary__cta"
+          (click)="pendingOrder() ? retryPayment() : placeOrder()"
+          [disabled]="placing() || quoteLoading() || !quote() || !selectedPayment()"
+        >
+          @if (placing()) {
+            <span class="spinner spinner--sm"></span> Processing…
+          } @else if (pendingOrder()) {
+            Retry payment <app-icon name="refresh" [size]="15" />
+          } @else {
+            {{ selectedPayment() === 'Mock' ? 'Complete demo order' : 'Pay securely' }}
+            @if (breakdown()) {
+              · {{ breakdown()!.totalAmount | inr }}
+            }
+            <app-icon name="arrow-right" [size]="15" />
+          }
+        </button>
+
+        <p class="co-summary__fine">
+          <app-icon name="shield" [size]="12" />
+          {{ paymentConfig()?.demoMode ? 'Demo mode — no real payment is taken.' : 'Payments are encrypted and verified server-side.' }}
+        </p>
+
+        <ul class="co-summary__trust">
+          <li><app-icon name="refresh" [size]="13" /> 7-day returns on unopened products</li>
+          <li><app-icon name="receipt" [size]="13" /> GST invoice emailed with confirmation</li>
+          <li><app-icon name="message" [size]="13" /> Real humans on support, Mon – Sat</li>
+        </ul>
+
+        <a routerLink="/cart" class="link-arrow co-summary__back">
+          <app-icon name="arrow-left" [size]="13" /> Back to bag
+        </a>
+      </div>
+
+      <div class="co-promise" appReveal [revealDelay]="90">
+        <app-icon name="sparkles" [size]="17" />
+        <p>
+          Every order is checked by the studio before it leaves. If something is not right, message us and we will
+          make it right.
+        </p>
+      </div>
+    </aside>
+  </div>
+</section>

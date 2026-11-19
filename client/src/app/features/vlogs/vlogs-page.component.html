@@ -1,0 +1,126 @@
+<app-page-hero
+  eyebrow="The studio channel"
+  title="Watch the artistry unfold."
+  subtitle="Bridal mornings, five-minute routines, influencer conversations and the quiet in-between moments of studio life. New films are added by the team through the studio desk."
+  imageUrl="/media/seed/vlog-1.jpg"
+  [crumbs]="[{ label: 'Home', url: '/' }, { label: 'Vlogs' }]"
+>
+  <a href="#channel" class="btn btn--gold">Browse the channel</a>
+  <a routerLink="/booking" class="btn btn--ghost-light">Book the studio</a>
+</app-page-hero>
+
+<section class="section channel" id="channel">
+  <div class="shell">
+    <div class="channel__bar" appReveal>
+      <div class="channel__filters">
+        @for (item of types; track item) {
+          <button type="button" class="chip" [class.is-active]="type() === item" (click)="setType(item)">
+            {{ item === 'All' ? 'All films' : item }}
+          </button>
+        }
+      </div>
+      <form class="channel__search" (submit)="$event.preventDefault(); applySearch(searchInput.value)">
+        <app-icon name="search" [size]="16" />
+        <input #searchInput type="search" [value]="search()" placeholder="Search the channel…" aria-label="Search vlogs" />
+        <button type="submit" class="btn btn--dark btn--sm">Search</button>
+      </form>
+    </div>
+
+    <div class="channel__meta" appReveal>
+      <span>{{ total() }} {{ total() === 1 ? 'film' : 'films' }}</span>
+      <span>Produced in the studio, Bengaluru</span>
+    </div>
+
+    @if (loading()) {
+      <div class="channel__skeleton">
+        <div class="skeleton channel__skeleton-hero"></div>
+        <div class="skeleton channel__skeleton-line"></div>
+      </div>
+    } @else if (featured(); as hero) {
+      <article class="channel__feature" appReveal>
+        <button type="button" class="channel__feature-media" (click)="open(hero)" aria-label="Play the featured film">
+          <img [src]="hero.thumbnailUrl || '/media/seed/vlog-1.jpg'" [alt]="hero.title" />
+          <span class="channel__feature-shade" aria-hidden="true"></span>
+          <span class="channel__play">
+            <app-icon name="play" [size]="20" />
+          </span>
+          <span class="channel__duration">{{ hero.durationSeconds | videoDuration }}</span>
+        </button>
+        <div class="channel__feature-copy">
+          <span class="eyebrow">{{ hero.type }} vlog · featured</span>
+          <h2>{{ hero.title }}</h2>
+          <p>{{ hero.description }}</p>
+          <div class="channel__feature-meta">
+            <span><app-icon name="user" [size]="13" /> {{ hero.influencerName || 'Makeup Art Studio' }}</span>
+            <span><app-icon name="eye" [size]="13" /> {{ hero.viewCount }} views</span>
+            <span><app-icon name="calendar" [size]="13" /> {{ hero.publishedAtUtc | dateLabel }}</span>
+          </div>
+          <div class="channel__feature-actions">
+            <button type="button" class="btn btn--primary btn--sm" (click)="open(hero)">
+              <app-icon name="play" [size]="14" /> Play the film
+            </button>
+            <a [routerLink]="['/vlogs', hero.slug]" class="btn btn--ghost btn--sm" (click)="watchPage(hero)">
+              <app-icon name="file-text" [size]="14" /> Read the notes
+            </a>
+          </div>
+        </div>
+      </article>
+
+      @if (grid().length) {
+        <div class="channel__grid">
+          @for (item of grid(); track item.id; let i = $index) {
+            <div appReveal [revealDelay]="(i % 3) * 80">
+              <app-vlog-card [item]="item" (play)="open($event)" />
+            </div>
+          }
+        </div>
+      }
+    } @else {
+      <div class="empty-state">
+        <app-icon name="youtube" [size]="30" />
+        <h3>No films in this collection yet</h3>
+        <p>Try another category or clear the search. New films are added regularly.</p>
+        <button type="button" class="btn btn--dark btn--sm" (click)="setType('All'); applySearch('')">Show all films</button>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="section section--cream subscribe">
+  <div class="shell subscribe__grid">
+    <div class="subscribe__copy" appReveal>
+      <span class="eyebrow">Stay close</span>
+      <h2>New films,<br /><em>first.</em></h2>
+      <p class="lede">
+        Follow the studio on your favourite channel. We share longer bridal films, quick routines and the
+        occasional behind-the-scenes morning.
+      </p>
+      <div class="subscribe__links">
+        @for (channel of channels; track channel.label) {
+          <a [href]="channel.url" target="_blank" rel="noopener" class="subscribe__link">
+            <app-icon [name]="channel.icon" [size]="18" />
+            <span>
+              <strong>{{ channel.label }}</strong>
+              <small>{{ channel.copy }}</small>
+            </span>
+            <app-icon name="arrow-up-right" [size]="14" />
+          </a>
+        }
+      </div>
+    </div>
+    <div class="subscribe__media" appReveal [revealDelay]="120">
+      <img src="/media/seed/studio-1.jpg" alt="Behind the scenes at the Makeup Art studio" loading="lazy" />
+      <div class="subscribe__badge">
+        <app-icon name="play" [size]="16" />
+        <span>
+          <strong>Studio channel</strong>
+          <small>New film every other week</small>
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+@if (lightbox(); as item) {
+  <app-media-lightbox [item]="item" (close)="lightbox.set(null)" />
+}

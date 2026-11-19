@@ -1,0 +1,224 @@
+<app-page-hero
+  eyebrow="Customer care"
+  title="A real person, on your side."
+  subtitle="Orders, deliveries, bookings, payments or a product that puzzled you — tell us what happened and the studio team will make it right. No bots, no scripts."
+  imageUrl="/media/seed/service-6.jpg"
+  [crumbs]="[{ label: 'Home', url: '/' }, { label: 'Support' }]"
+>
+  <a href="#ticket" class="btn btn--gold">Raise a ticket</a>
+  <a routerLink="/faq" class="btn btn--ghost-light">Read the FAQ</a>
+</app-page-hero>
+
+<section class="support-strip">
+  <div class="shell support-strip__row">
+    @for (channel of channels; track channel.title) {
+      <a
+        class="support-strip__item"
+        [href]="channel.href()"
+        [attr.target]="channel.external ? '_blank' : null"
+        [attr.rel]="channel.external ? 'noopener' : null"
+      >
+        <span class="support-strip__icon"><app-icon [name]="channel.icon" [size]="18" /></span>
+        <span>
+          <small>{{ channel.title }}</small>
+          <strong>{{ channel.action }}</strong>
+          <em>{{ channel.copy }}</em>
+        </span>
+      </a>
+    }
+  </div>
+</section>
+
+<section class="section support" id="ticket">
+  <div class="shell support__grid">
+    <div class="support__main" appReveal>
+      <div class="support__head">
+        <span class="eyebrow">Support desk</span>
+        <h2>Tell us what<br /><em>happened.</em></h2>
+        <p>
+          Tickets keep the whole conversation in one place — useful for orders, returns and anything that needs
+          a written trail. Sign in so we can link your order history automatically.
+        </p>
+      </div>
+
+      @if (ticket(); as raised) {
+        <div class="support__success" role="status">
+          <span class="support__success-icon"><app-icon name="check" [size]="24" /></span>
+          <div>
+            <h3>Ticket {{ raised.ticketNumber }} is open.</h3>
+            <p>
+              We have emailed a copy to you and the studio team has been notified. Most tickets are answered
+              within one working day — sooner on WhatsApp.
+            </p>
+            <div class="support__success-actions">
+              <a routerLink="/account/support" [queryParams]="{ ticket: raised.id }" class="btn btn--primary btn--sm">
+                Open the conversation
+              </a>
+              @if (site.whatsAppUrl()) {
+                <a [href]="site.whatsAppUrl()" target="_blank" rel="noopener" class="btn btn--ghost btn--sm">
+                  <app-icon name="whatsapp" [size]="14" /> WhatsApp the studio
+                </a>
+              }
+            </div>
+          </div>
+        </div>
+      } @else if (!auth.isAuthenticated()) {
+        <div class="support__signin">
+          <app-icon name="lock" [size]="22" />
+          <div>
+            <h3>Sign in to raise a ticket</h3>
+            <p>
+              A quick sign-in lets us attach your orders, addresses and past conversations so you never have to
+              repeat yourself.
+            </p>
+            <div class="row">
+              <a routerLink="/login" [queryParams]="{ returnUrl: '/support' }" class="btn btn--primary btn--sm">Sign in</a>
+              <a routerLink="/register" class="btn btn--ghost btn--sm">Create an account</a>
+            </div>
+          </div>
+        </div>
+        <p class="support__guest-note">
+          Prefer not to sign in? Use the
+          <a routerLink="/contact">contact form</a> or message the studio on WhatsApp — we will still help.
+        </p>
+      } @else {
+        <form class="support__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <div class="support__row">
+            <label class="field">
+              <span>Subject *</span>
+              <input
+                class="input"
+                type="text"
+                formControlName="subject"
+                placeholder="A short summary — e.g. Order arrived damaged"
+                [class.input--error]="fieldError('subject')"
+              />
+              @if (fieldError('subject')) {
+                <small class="field-error">{{ fieldError('subject') }}</small>
+              }
+            </label>
+            <label class="field">
+              <span>Category *</span>
+              <select class="select" formControlName="category">
+                @for (category of categories; track category) {
+                  <option [value]="category">{{ category }}</option>
+                }
+              </select>
+            </label>
+          </div>
+
+          <label class="field">
+            <span>What happened? *</span>
+            <textarea
+              class="textarea"
+              formControlName="message"
+              rows="6"
+              placeholder="Include your order or booking number, what you expected and what you would like us to do."
+              [class.textarea--error]="fieldError('message')"
+            ></textarea>
+            <span class="field-hint">{{ form.controls.message.value.length }}/5000</span>
+            @if (fieldError('message')) {
+              <small class="field-error">{{ fieldError('message') }}</small>
+            }
+          </label>
+
+          <div class="support__submit">
+            <button type="submit" class="btn btn--primary" [disabled]="submitting()">
+              @if (submitting()) {
+                <span class="spinner spinner--sm"></span> Opening ticket…
+              } @else {
+                <app-icon name="ticket" [size]="15" /> Raise the ticket
+              }
+            </button>
+            <p>You are signed in as {{ auth.user()?.email }}.</p>
+          </div>
+        </form>
+      }
+
+      <div class="support__quick">
+        @for (policy of policies; track policy.title; let i = $index) {
+          <article class="support__quick-card" appReveal [revealDelay]="i * 60">
+            <span class="support__quick-icon"><app-icon [name]="policy.icon" [size]="17" /></span>
+            <div>
+              <h3>{{ policy.title }}</h3>
+              <p>{{ policy.copy }}</p>
+              <a [routerLink]="policy.link" class="link-arrow">{{ policy.linkLabel }} <app-icon name="arrow-right" [size]="12" /></a>
+            </div>
+          </article>
+        }
+      </div>
+    </div>
+
+    <aside class="support__aside">
+      <div class="support__card" appReveal>
+        <span class="eyebrow">Response times</span>
+        <ul class="support__times">
+          @for (entry of responseTimes; track entry.channel) {
+            <li>
+              <span>{{ entry.channel }}</span>
+              <strong>{{ entry.time }}</strong>
+            </li>
+          }
+        </ul>
+        <p class="support__small">
+          Festival weeks and wedding season can add a day. If something is urgent, call the studio — a person
+          answers during business hours.
+        </p>
+      </div>
+
+      <div class="support__card support__card--dark" appReveal [revealDelay]="80">
+        <span class="eyebrow eyebrow--light">Studio promise</span>
+        <h3>We fix what we can, and we are honest when we cannot.</h3>
+        <p>
+          If a product arrived damaged, a shade is not right or a parcel is late, tell us. We would rather hear
+          it early than have you quietly disappointed.
+        </p>
+        @if (site.whatsAppUrl()) {
+          <a [href]="site.whatsAppUrl()" target="_blank" rel="noopener" class="btn btn--gold btn--sm">
+            <app-icon name="whatsapp" [size]="14" /> WhatsApp us
+          </a>
+        }
+      </div>
+
+      @if (faqs().length) {
+        <div class="support__card" appReveal [revealDelay]="140">
+          <span class="eyebrow">Quick answers</span>
+          <div class="support__faqs">
+            @for (item of faqs(); track item.id) {
+              <article class="support__faq" [class.is-open]="openFaq() === item.id">
+                <button type="button" (click)="toggleFaq(item.id)" [attr.aria-expanded]="openFaq() === item.id">
+                  <span>{{ item.question }}</span>
+                  <app-icon [name]="openFaq() === item.id ? 'minus' : 'plus'" [size]="13" />
+                </button>
+                @if (openFaq() === item.id) {
+                  <p>{{ item.answer }}</p>
+                }
+              </article>
+            }
+          </div>
+          <a routerLink="/faq" class="link-arrow">See all questions <app-icon name="arrow-right" [size]="13" /></a>
+        </div>
+      }
+    </aside>
+  </div>
+</section>
+
+<section class="section section--cream support-footer">
+  <div class="shell support-footer__grid">
+    <div class="support-footer__copy" appReveal>
+      <span class="eyebrow">Still stuck?</span>
+      <h2>The studio<br /><em>is listening.</em></h2>
+      <p class="lede">
+        Every message is read by the team that packs the parcels and runs the chair. Nothing is outsourced, and
+        nothing is dismissed.
+      </p>
+      <div class="row">
+        <a routerLink="/contact" class="btn btn--primary">Send a note</a>
+        <a routerLink="/account/support" class="btn btn--ghost">My tickets</a>
+      </div>
+    </div>
+    <div class="support-footer__media" appReveal [revealDelay]="100">
+      <img src="/media/seed/about.jpg" alt="The Makeup Art studio team" loading="lazy" />
+    </div>
+  </div>
+</section>

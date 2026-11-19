@@ -1,0 +1,151 @@
+<app-page-hero
+  eyebrow="Signature packages"
+  title="The whole morning, handled."
+  subtitle="Skin prep, hair, draping and a take-home touch-up kit — bundled into one transparent price. Choose a starting point and we will shape the rest around your date, your outfit and your people."
+  imageUrl="/media/seed/package-1.jpg"
+  [crumbs]="[{ label: 'Home', url: '/' }, { label: 'Packages' }]"
+>
+  <a routerLink="/booking" class="btn btn--gold">Check my date</a>
+  <a href="#compare" class="btn btn--ghost-light">See what’s included</a>
+</app-page-hero>
+
+<section class="section section--tight package-menu">
+  <div class="shell">
+    <div class="package-menu__bar" appReveal>
+      <div class="package-menu__filters">
+        @for (item of occasions; track item.value) {
+          <button
+            type="button"
+            class="chip"
+            [class.is-active]="occasion() === item.value"
+            (click)="setOccasion(item.value)"
+          >
+            {{ item.label }}
+          </button>
+        }
+      </div>
+      <label class="package-menu__sort">
+        <span>Sort</span>
+        <select class="select" [value]="sort()" (change)="setSort($any($event.target).value)">
+          <option value="curated">Curated</option>
+          <option value="price">Price · low to high</option>
+          <option value="price-high">Price · high to low</option>
+          <option value="name">A – Z</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="package-menu__count" appReveal>
+      <span>{{ total() }} {{ total() === 1 ? 'package' : 'packages' }}</span>
+      @if (startingPrice()) {
+        <span>From <strong>{{ startingPrice() | inr }}</strong> · GST calculated at checkout</span>
+      }
+    </div>
+
+    @if (loading()) {
+      <div class="package-menu__grid">
+        @for (item of [1, 2, 3]; track item) {
+          <div class="package-menu__skeleton">
+            <div class="skeleton package-menu__skeleton-media"></div>
+            <div class="skeleton package-menu__skeleton-line"></div>
+            <div class="skeleton package-menu__skeleton-line package-menu__skeleton-line--short"></div>
+          </div>
+        }
+      </div>
+    } @else if (packages().length) {
+      <div class="package-menu__grid">
+        @for (item of packages(); track item.id; let i = $index) {
+          <div appReveal [revealDelay]="(i % 3) * 90">
+            <app-package-card [item]="item" />
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="empty-state">
+        <app-icon name="package" [size]="28" />
+        <h3>No packages in this collection yet</h3>
+        <p>Try another occasion, or ask the studio to build a custom package for your date.</p>
+        <a routerLink="/contact" class="btn btn--dark btn--sm">Ask the studio</a>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="section included" id="compare">
+  <div class="shell">
+    <div class="section-head" appReveal>
+      <div class="section-head__copy">
+        <span class="eyebrow">Every package includes</span>
+        <h2>The quiet things<br /><em>that matter.</em></h2>
+        <p class="lede">
+          Whichever package you choose, these are the standards we never compromise on — the details that make
+          the morning feel calm and the photographs feel like you.
+        </p>
+      </div>
+    </div>
+
+    <div class="included__grid">
+      @for (item of included; track item.title; let i = $index) {
+        <article class="included__card" appReveal [revealDelay]="i * 70">
+          <span class="included__icon"><app-icon [name]="item.icon" [size]="19" /></span>
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.copy }}</p>
+        </article>
+      }
+    </div>
+
+    <div class="included__band" appReveal>
+      <div>
+        <span class="eyebrow">Need something bespoke?</span>
+        <h3>Multi-day, outstation or a full family morning?</h3>
+        <p>Share the dates and headcount and we will build a plan around your events, not the other way round.</p>
+      </div>
+      <div class="row">
+        <a routerLink="/booking" class="btn btn--primary btn--sm">Request a quote</a>
+        <a routerLink="/contact" class="btn btn--ghost btn--sm">Talk to the studio</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section package-faq">
+  <div class="shell package-faq__grid">
+    <div class="package-faq__intro" appReveal>
+      <span class="eyebrow">Package notes</span>
+      <h2>The practical<br /><em>bits.</em></h2>
+      <p class="lede">
+        Advances, trials, travel and customisation — the questions our brides ask before they reserve a date.
+      </p>
+      <a routerLink="/faq" class="link-arrow">Full FAQ <app-icon name="arrow-right" [size]="14" /></a>
+    </div>
+    <div class="package-faq__list" appReveal [revealDelay]="120">
+      @for (item of faq; track item.q; let i = $index) {
+        <article class="package-faq__item" [class.is-open]="openFaq() === i">
+          <button type="button" class="package-faq__question" (click)="toggleFaq(i)" [attr.aria-expanded]="openFaq() === i">
+            <span>{{ item.q }}</span>
+            <app-icon [name]="openFaq() === i ? 'minus' : 'plus'" [size]="15" />
+          </button>
+          @if (openFaq() === i) {
+            <p class="package-faq__answer">{{ item.a }}</p>
+          }
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="booking-band">
+  <div class="shell booking-band__inner" appReveal>
+    <div>
+      <span class="eyebrow eyebrow--light">The chair is yours</span>
+      <h2>Reserve the date<br /><em>before it goes.</em></h2>
+      <p>Wedding season fills quickly. Tell us your dates and we will confirm artist availability within one working day.</p>
+    </div>
+    <div class="booking-band__actions">
+      <a routerLink="/booking" class="btn btn--gold">Book an appointment</a>
+      <a [href]="'https://wa.me/' + (site.settings().whatsApp || '').replace('+', '')" target="_blank" rel="noopener" class="btn btn--ghost-light">
+        <app-icon name="whatsapp" [size]="15" /> WhatsApp us
+      </a>
+    </div>
+  </div>
+</section>

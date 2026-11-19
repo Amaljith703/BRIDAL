@@ -1,0 +1,163 @@
+﻿<app-page-hero
+  eyebrow="The studio edit"
+  title="What lives on our tray."
+  subtitle="The products our artists actually reach for â€” chosen for real skin, tested through long days and available to take home. No filler, no trend-chasing, just the kit we trust."
+  imageUrl="/media/seed/category-complexion.jpg"
+  [crumbs]="[{ label: 'Home', url: '/' }, { label: 'Shop' }]"
+>
+  <a href="#shop" class="btn btn--gold">Shop the edit</a>
+  <button type="button" class="btn btn--ghost-light" (click)="openFilters.set(!openFilters())">Filter the edit</button>
+</app-page-hero>
+
+<section class="perks">
+  <div class="shell perks__row">
+    @for (perk of perks; track perk.title) {
+      <div class="perks__item">
+        <app-icon [name]="perk.icon" [size]="17" />
+        <div>
+          <strong>{{ perk.title }}</strong>
+          <small>{{ perk.copy }}</small>
+        </div>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="section section--tight shop" id="shop">
+  <div class="shell">
+    <div class="shop__bar" appReveal>
+      <form class="shop__search" (submit)="$event.preventDefault(); applySearch(searchInput.value)">
+        <app-icon name="search" [size]="17" />
+        <input
+          #searchInput
+          type="search"
+          name="search"
+          [value]="search()"
+          placeholder="Search the edit â€” lip, glow, primerâ€¦"
+          aria-label="Search products"
+        />
+        <button type="submit" class="btn btn--dark btn--sm">Search</button>
+      </form>
+
+      <div class="shop__actions">
+        <button type="button" class="shop__filter-toggle" [class.is-active]="openFilters()" (click)="openFilters.set(!openFilters())">
+          <app-icon name="filter" [size]="15" /> Filters
+        </button>
+        <label class="shop__sort">
+          <span>Sort</span>
+          <select class="select" [value]="sort()" (change)="setSort($any($event.target).value)">
+            <option value="curated">Curated</option>
+            <option value="price">Price Â· low to high</option>
+            <option value="price-high">Price Â· high to low</option>
+            <option value="rating">Best rated</option>
+            <option value="newest">Newest first</option>
+            <option value="name">A â€“ Z</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div class="shop__filters" [class.is-open]="openFilters()">
+      <div class="shop__filter-group">
+        <span class="shop__filter-label">Category</span>
+        <div class="shop__chips">
+          <button type="button" class="chip" [class.is-active]="category() === 'all'" (click)="setCategory('all')">
+            All
+          </button>
+          @for (item of categories(); track item.id) {
+            <button type="button" class="chip" [class.is-active]="category() === item.slug" (click)="setCategory(item.slug)">
+              {{ item.name }}
+            </button>
+          }
+        </div>
+      </div>
+      <div class="shop__filter-group">
+        <span class="shop__filter-label">Price</span>
+        <div class="shop__chips">
+          @for (band of priceBands; track band.value) {
+            <button type="button" class="chip" [class.is-active]="priceBand() === band.value" (click)="setPriceBand(band.value)">
+              {{ band.label }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="shop__meta" appReveal>
+      <span>{{ total() }} {{ total() === 1 ? 'piece' : 'pieces' }} in the edit</span>
+      @if (hasFilters()) {
+        <button type="button" class="shop__clear" (click)="clear()">
+          <app-icon name="close" [size]="12" /> Clear filters
+        </button>
+      }
+    </div>
+
+    @if (loading()) {
+      <div class="shop__grid">
+        @for (item of [1, 2, 3, 4, 5, 6, 7, 8]; track item) {
+          <div class="shop__skeleton">
+            <div class="skeleton shop__skeleton-media"></div>
+            <div class="skeleton shop__skeleton-line"></div>
+            <div class="skeleton shop__skeleton-line shop__skeleton-line--short"></div>
+          </div>
+        }
+      </div>
+    } @else if (products().length) {
+      <div class="shop__grid">
+        @for (product of products(); track product.id; let i = $index) {
+          <div appReveal [revealDelay]="(i % 4) * 70">
+            <app-product-card [product]="product" />
+          </div>
+        }
+      </div>
+
+      @if (totalPages() > 1) {
+        <nav class="pagination" aria-label="Product pages">
+          <button type="button" [disabled]="page() === 1" (click)="goTo(page() - 1)" aria-label="Previous page">
+            <app-icon name="chevron-left" [size]="16" />
+          </button>
+          @for (number of pages(); track number) {
+            <button type="button" [class.is-active]="number === page()" (click)="goTo(number)">{{ number }}</button>
+          }
+          <button type="button" [disabled]="page() === totalPages()" (click)="goTo(page() + 1)" aria-label="Next page">
+            <app-icon name="chevron-right" [size]="16" />
+          </button>
+        </nav>
+      }
+    } @else {
+      <div class="empty-state">
+        <app-icon name="bag" [size]="28" />
+        <h3>Nothing matches that edit</h3>
+        <p>Try a different word or clear the filters. The studio can also recommend products personally.</p>
+        <div class="row">
+          <button type="button" class="btn btn--dark btn--sm" (click)="clear()">Show everything</button>
+          <a routerLink="/support" class="btn btn--ghost btn--sm">Ask an artist</a>
+        </div>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="section shop-note">
+  <div class="shell shop-note__inner" appReveal>
+    <div class="shop-note__copy">
+      <span class="eyebrow">Not sure where to start?</span>
+      <h2>Tell us your skin,<br /><em>weâ€™ll build the routine.</em></h2>
+      <p>
+        Our beauty advisor can put together a simple routine from the edit â€” cleanser to finishing mist â€” with
+        nothing you do not need.
+      </p>
+      <div class="row">
+        <a routerLink="/services" class="btn btn--dark btn--sm">Book a lesson</a>
+        <a routerLink="/contact" class="btn btn--ghost btn--sm">Ask the studio</a>
+      </div>
+    </div>
+    <div class="shop-note__media">
+      <img src="/media/seed/product-11.jpg" alt="A curated arrangement from the studio edit" loading="lazy" />
+      <span class="shop-note__badge">
+        <app-icon name="sparkles" [size]="15" />
+        Artist-curated
+      </span>
+    </div>
+  </div>
+</section>

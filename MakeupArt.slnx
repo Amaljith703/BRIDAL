@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MakeupArt.Api/MakeupArt.Api.csproj" />
+    <Project Path="src/MakeupArt.Application/MakeupArt.Application.csproj" />
+    <Project Path="src/MakeupArt.Domain/MakeupArt.Domain.csproj" />
+    <Project Path="src/MakeupArt.Infrastructure/MakeupArt.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MakeupArt.IntegrationTests/MakeupArt.IntegrationTests.csproj" />
+    <Project Path="tests/MakeupArt.UnitTests/MakeupArt.UnitTests.csproj" />
+  </Folder>
+</Solution>

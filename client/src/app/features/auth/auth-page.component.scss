@@ -1,0 +1,25 @@
+:host { display: block; min-height: 68vh; background: radial-gradient(ellipse at 50% 0, #f2e5e2 0, #faf6f1 62%); color: #3d2a2f; }
+.auth-page { display: grid; min-height: 68vh; place-items: center; padding: 44px 18px 76px; }
+.auth-card { width: min(100%, 460px); padding: clamp(24px, 5vw, 42px); border: 1px solid rgba(61,42,47,.1); border-radius: 24px; background: rgba(255,253,251,.93); box-shadow: 0 24px 80px -50px rgba(61,42,47,.35); }
+.auth-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 36px; color: #3d2a2f; font: 500 1rem Georgia,serif; text-decoration: none; }
+.auth-brand span { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 50%; background: #8e4a5b; color: #fff; }
+.eyebrow { margin: 0 0 10px; color: #8e4a5b; font-size: .66rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+h1 { margin: 0; font: 400 clamp(2rem, 7vw, 2.8rem)/1.05 Georgia,serif; }
+.intro { margin: 13px 0 24px; color: #806e72; font-size: .9rem; line-height: 1.65; }
+form { display: grid; gap: 15px; }
+label { display: grid; gap: 7px; font-size: .81rem; font-weight: 600; }
+.input { width: 100%; min-height: 46px; padding: 11px 13px; border: 1px solid #ded0ca; border-radius: 10px; background: #fff; color: #3d2a2f; font: inherit; }
+.input:focus { outline: 3px solid rgba(142,74,91,.17); border-color: #8e4a5b; }
+.field-row { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.field-error { margin-top: -10px; color: #a33145; font-size: .76rem; }
+.field-help,.optional { color: #806e72; font-size: .74rem; font-weight: 400; }
+.optional { display: inline; }
+.check-row { display: flex; align-items: flex-start; gap: 9px; color: #705d61; font-weight: 400; line-height: 1.5; }
+.check-row input { margin: 3px 0 0; accent-color: #8e4a5b; }
+.submit { min-height: 48px; margin-top: 4px; }
+.notice { margin-bottom: 16px; padding: 12px 14px; border-radius: 11px; font-size: .84rem; line-height: 1.5; }
+.notice--success { background: #e8f2ea; color: #315b43; }
+.notice--error { background: #fbe9ea; color: #7a2636; }
+.auth-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 12px; margin-top: 22px; color: #806e72; font-size: .79rem; }
+.auth-links a { color: #8e4a5b; font-weight: 700; }
+@media(max-width:480px) { .field-row { grid-template-columns: 1fr; } .auth-card { padding: 25px 20px; } }

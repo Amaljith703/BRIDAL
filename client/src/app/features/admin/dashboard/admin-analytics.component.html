@@ -1,0 +1,32 @@
+<section class="analytics-page section"><div class="shell">
+  <header class="analytics-head">
+    <div><p class="eyebrow">Studio desk · insights</p><h1>Know what <em>resonates.</em></h1><p class="muted">Visits, product interest and the paths people take through the studio.</p></div>
+    <button type="button" class="btn btn--ghost" (click)="load()" [disabled]="loading()"><app-icon name="refresh" [size]="16" /> Refresh</button>
+  </header>
+
+  <nav class="range-picker" aria-label="Analytics date range">
+    @for (range of ranges; track range) {
+      <button type="button" [class.is-active]="days() === range" [attr.aria-pressed]="days() === range" (click)="selectRange(range)">{{ range === 365 ? '12 months' : range + ' days' }}</button>
+    }
+  </nav>
+
+  @if (error()) { <div class="notice--error" role="alert">{{ error() }}</div> }
+  @if (analytics(); as data) {
+    <div class="metric-grid">
+      <article class="metric-card metric-card--featured"><span>Page views</span><strong>{{ data.pageViews | number }}</strong><small>Across {{ days() }} days</small></article>
+      <article class="metric-card"><span>Unique sessions</span><strong>{{ data.uniqueSessions | number }}</strong><small>Distinct studio visits</small></article>
+      <article class="metric-card"><span>Product views</span><strong>{{ data.productViews | number }}</strong><small>{{ data.addToCarts | number }} added to bag</small></article>
+      <article class="metric-card"><span>Checkout starts</span><strong>{{ data.checkouts | number }}</strong><small>{{ data.conversionRate }}% of page views</small></article>
+    </div>
+
+    <div class="chart-grid">
+      <article class="chart-card chart-card--wide"><header><div><h2>Visitors over time</h2><p>Page views by day</p></div><span class="chart-note">{{ data.pageViews | number }} views</span></header><app-admin-chart [option]="pageViewsOption()" ariaLabel="Daily page views" /></article>
+      <article class="chart-card"><header><div><h2>Most visited pages</h2><p>Where visitors spend time</p></div></header><app-admin-chart [option]="topPagesOption()" ariaLabel="Most visited pages" /></article>
+      <article class="chart-card"><header><div><h2>How visitors found you</h2><p>Referring sites and direct visits</p></div></header><app-admin-chart [option]="sourcesOption()" ariaLabel="Traffic source breakdown" /></article>
+      <article class="chart-card"><header><div><h2>Devices</h2><p>Device type from recorded visits</p></div></header><app-admin-chart [option]="devicesOption()" ariaLabel="Visits by device type" /></article>
+      <article class="chart-card"><header><div><h2>Studio interactions</h2><p>Actions recorded in this period</p></div></header><app-admin-chart [option]="eventsOption()" ariaLabel="Recorded visitor events" /></article>
+    </div>
+  } @else if (!loading()) {
+    <div class="empty-state"><h2>Analytics are not available yet</h2><p>Check the API connection, then refresh to try again.</p><a routerLink="/admin">Return to dashboard</a></div>
+  } @else { <div class="loading-state" role="status">Loading visitor activity…</div> }
+</div></section>

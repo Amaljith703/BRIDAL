@@ -1,0 +1,198 @@
+:host {
+  display: block;
+}
+
+.combo-strip {
+  background: #332226;
+  color: #faf6f1;
+}
+.combo-strip__row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px 26px;
+  padding-block: 20px;
+}
+.combo-strip__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.combo-strip__item app-icon {
+  color: #c9a26b;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.combo-strip__item strong {
+  display: block;
+  font-size: 0.72rem;
+}
+.combo-strip__item small {
+  display: block;
+  font-size: 0.64rem;
+  line-height: 1.5;
+  color: rgba(250, 246, 241, 0.52);
+}
+
+.combos {
+  background:
+    radial-gradient(900px 440px at 100% 0%, rgba(233, 200, 193, 0.12), transparent 62%),
+    var(--brand-surface);
+}
+.combos__bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding-bottom: 22px;
+}
+.combos__search {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: min(340px, 100%);
+  padding: 6px 6px 6px 14px;
+  border: 1px solid var(--brand-line);
+  border-radius: var(--radius-pill);
+  background: var(--brand-white);
+  color: var(--brand-ink-soft);
+}
+.combos__search:focus-within {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 4px rgba(142, 74, 91, 0.08);
+}
+.combos__search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font-size: 0.86rem;
+  padding: 8px 0;
+  color: var(--brand-ink);
+}
+.combos__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--brand-line);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brand-ink-soft);
+}
+.combos__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 2.4vw, 28px);
+  padding-top: clamp(24px, 3.5vw, 38px);
+}
+.combos__skeleton {
+  display: grid;
+  gap: 12px;
+}
+.combos__skeleton-media {
+  aspect-ratio: 4 / 3.6;
+  border-radius: 18px;
+}
+.combos__skeleton-line {
+  height: 16px;
+  width: 80%;
+}
+.combos__skeleton-line--short {
+  width: 46%;
+}
+
+.offers-tease__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(28px, 5vw, 72px);
+  align-items: center;
+}
+.offers-tease__media {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3.2;
+  box-shadow: 0 40px 80px -50px rgba(61, 42, 47, 0.55);
+}
+.offers-tease__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1s var(--ease);
+}
+.offers-tease__media:hover img {
+  transform: scale(1.04);
+}
+.offers-tease__tag {
+  position: absolute;
+  left: 18px;
+  top: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 253, 251, 0.94);
+  color: var(--brand-primary);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.offers-tease__copy h2 {
+  margin: 10px 0;
+  font-size: clamp(2rem, 3.4vw, 3.2rem);
+}
+.offers-tease__copy p {
+  max-width: 46ch;
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: var(--brand-ink-soft);
+}
+.offers-tease__code {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 16px 0 22px;
+  padding: 12px 18px;
+  border: 1px dashed var(--brand-line-strong);
+  border-radius: var(--radius-sm);
+  width: fit-content;
+}
+.offers-tease__code span {
+  font-size: 0.64rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brand-ink-soft);
+}
+.offers-tease__code strong {
+  font-size: 0.92rem;
+  letter-spacing: 0.22em;
+  color: var(--brand-primary);
+}
+
+@media (max-width: 1000px) {
+  .combo-strip__row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .combos__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .offers-tease__grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .combo-strip__row,
+  .combos__grid {
+    grid-template-columns: 1fr;
+  }
+  .combos__search {
+    width: 100%;
+  }
+}

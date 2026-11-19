@@ -1,0 +1,525 @@
+<section class="hero" [style.--hero-accent]="current().accentColor">
+  <app-hero-scene
+    [accent]="current().accentColor || '#E9C8C1'"
+    [secondary]="current().secondaryColor || '#C9A26B'"
+  />
+
+  <div class="hero__wash" aria-hidden="true"></div>
+  <div class="hero__grain" aria-hidden="true"></div>
+
+  <div class="shell hero__inner">
+    <div class="hero__copy">
+      <span class="hero__eyebrow">
+        <app-icon name="sparkles" [size]="13" />
+        {{ current().eyebrow }}
+      </span>
+
+      <h1 class="hero__title">
+        <span>{{ heroLead(current()) }}</span>
+        @if (heroTail(current())) {
+          <em>{{ heroTail(current()) }}</em>
+        }
+      </h1>
+
+      <p class="hero__subtitle">{{ current().subtitle }}</p>
+
+      <div class="hero__actions">
+        <a class="btn btn--gold" [routerLink]="current().ctaUrl || '/packages'">
+          {{ current().ctaLabel || 'Explore the studio' }}
+          <app-icon name="arrow-up-right" [size]="15" />
+        </a>
+        <a class="btn btn--ghost-light" [routerLink]="current().secondaryCtaUrl || '/portfolio'">
+          {{ current().secondaryCtaLabel || 'View portfolio' }}
+        </a>
+      </div>
+
+      <div class="hero__proof">
+        <div class="hero__avatars" aria-hidden="true">
+          @for (person of testimonials().slice(0, 3); track person.id) {
+            @if (person.imageUrl) {
+              <img [src]="person.imageUrl" [alt]="person.customerName" />
+            }
+          }
+          <span class="hero__avatar-fallback">600+</span>
+        </div>
+        <div class="hero__proof-copy">
+          <span class="stars" aria-hidden="true">
+            @for (star of [1, 2, 3, 4, 5]; track star) {
+              <app-icon name="star" [size]="13" />
+            }
+          </span>
+          <span>Five-star bridal & editorial artistry across Bengaluru</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero__visual">
+      <div class="hero__arch">
+        @for (slide of slides(); track slide.id; let i = $index) {
+          <img
+            [src]="slide.modelImageUrl"
+            [alt]="slide.title"
+            [class.is-active]="i === active()"
+            [attr.loading]="i === 0 ? 'eager' : 'lazy'"
+            appImgFallback
+          />
+        }
+        <span class="hero__arch-border" aria-hidden="true"></span>
+        <span class="hero__arch-caption">
+          <app-icon name="brush" [size]="13" />
+          Studio signature · {{ current().eyebrow }}
+        </span>
+      </div>
+
+      <div class="hero__float hero__float--rating">
+        <span class="hero__float-label">Loved by our brides</span>
+        <strong>5.0</strong>
+        <span class="hero__float-stars stars">
+          @for (star of [1, 2, 3, 4, 5]; track star) {
+            <app-icon name="star" [size]="11" />
+          }
+        </span>
+        <small>312 verified love notes</small>
+      </div>
+
+      <div class="hero__float hero__float--chair">
+        <span class="hero__float-dot" aria-hidden="true"></span>
+        <div>
+          <strong>Chairs open this week</strong>
+          <a routerLink="/booking">Reserve a slot <app-icon name="arrow-right" [size]="12" /></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="shell hero__foot">
+    <div class="hero__controls" aria-label="Hero slides">
+      <button type="button" class="hero__arrow" (click)="previous()" aria-label="Previous slide">
+        <app-icon name="arrow-left" [size]="16" />
+      </button>
+      @for (slide of slides(); track slide.id; let i = $index) {
+        <button
+          type="button"
+          class="hero__dot"
+          [class.is-active]="i === active()"
+          (click)="go(i)"
+          [attr.aria-label]="'Go to slide ' + (i + 1)"
+        >
+          <span>0{{ i + 1 }}</span>
+          <i aria-hidden="true"></i>
+        </button>
+      }
+      <button type="button" class="hero__arrow" (click)="next()" aria-label="Next slide">
+        <app-icon name="arrow-right" [size]="16" />
+      </button>
+    </div>
+
+    <dl class="hero__stats">
+      <div>
+        <dt>Years of artistry</dt>
+        <dd>12<span>+</span></dd>
+      </div>
+      <div>
+        <dt>Brides styled</dt>
+        <dd>600<span>+</span></dd>
+      </div>
+      <div>
+        <dt>Studio looks</dt>
+        <dd>40<span>+</span></dd>
+      </div>
+    </dl>
+
+    <a class="hero__cue" href="#studio">
+      <span class="hero__cue-line" aria-hidden="true"></span>
+      Scroll to step inside
+    </a>
+  </div>
+</section>
+
+<div class="marquee marquee--hero" aria-hidden="true">
+  <div class="marquee__track">
+    @for (item of marqueeLoop; track item.key) {
+      <span>{{ item.word }}</span>
+    }
+  </div>
+</div>
+
+<section class="section story" id="studio">
+  <div class="shell two-col story__grid">
+    <div class="story__media" appReveal>
+      <figure class="story__main media-frame">
+        <img
+          [src]="portfolio()[0]?.imageUrl || '/media/seed/portfolio-1.jpg'"
+          alt="A signature Makeup Art look"
+          appImgFallback
+        />
+      </figure>
+      <figure class="story__small media-frame">
+        <img
+          [src]="portfolio()[2]?.imageUrl || '/media/seed/portfolio-3.jpg'"
+          alt="Behind the scenes at the studio"
+          appImgFallback
+        />
+      </figure>
+      <div class="story__seal">
+        <span>Est.</span>
+        <strong>2014</strong>
+        <span>Bengaluru</span>
+      </div>
+      <div class="story__badge">
+        <app-icon name="leaf" [size]="17" />
+        <span>
+          <strong>Skin-first</strong>
+          <small>Every look begins with care</small>
+        </span>
+      </div>
+    </div>
+
+    <div class="story__copy" appReveal [revealDelay]="140">
+      <span class="eyebrow">The studio</span>
+      <h2>Beauty that feels<br /><em>quietly like you.</em></h2>
+      <p class="lede">
+        We are a small team of artists who believe makeup should never walk into the room before you do. Soft
+        textures, considered colour and a lit-from-within finish — built around your features, your skin and the
+        story you want to tell.
+      </p>
+
+      <ul class="story__pillars">
+        <li>
+          <span class="story__pillar-icon"><app-icon name="brush" [size]="18" /></span>
+          <div>
+            <strong>Artist-led, always</strong>
+            <p>Every booking is styled by a senior artist — never handed off or rushed.</p>
+          </div>
+        </li>
+        <li>
+          <span class="story__pillar-icon"><app-icon name="leaf" [size]="18" /></span>
+          <div>
+            <strong>Skin first</strong>
+            <p>Prep, barrier care and products chosen for Indian skin tones and climate.</p>
+          </div>
+        </li>
+        <li>
+          <span class="story__pillar-icon"><app-icon name="gem" [size]="18" /></span>
+          <div>
+            <strong>The long-wear promise</strong>
+            <p>Photograph-ready at 9am, still luminous at the last song of the night.</p>
+          </div>
+        </li>
+      </ul>
+
+      <div class="story__signature">
+        <span class="story__sign-name">Aarohi Sen</span>
+        <span class="story__sign-role">Founder & lead artist</span>
+      </div>
+
+      <a routerLink="/about" class="link-arrow">
+        Meet the team <app-icon name="arrow-right" [size]="14" />
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section section--cream services">
+  <div class="shell">
+    <div class="section-head" appReveal>
+      <div class="section-head__copy">
+        <span class="eyebrow">The menu</span>
+        <h2>Rituals for every<br /><em>version of you.</em></h2>
+        <p class="lede">
+          From a soft five-minute face to a full bridal morning, each service is shaped in consultation and
+          finished with a take-home touch-up plan.
+        </p>
+      </div>
+      <div class="section-head__actions">
+        <a routerLink="/services" class="link-arrow">All services <app-icon name="arrow-right" [size]="14" /></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="shell">
+    @if (featuredServices().length) {
+      <app-horizontal-rail label="services">
+        @for (service of featuredServices(); track service.id) {
+          <div class="rail-item rail-item--service">
+            <app-service-card [service]="service" />
+          </div>
+        }
+      </app-horizontal-rail>
+    } @else {
+      <div class="empty-state">
+        <app-icon name="brush" [size]="26" />
+        <p>Our artists are refreshing the service menu. Contact the studio for a personal recommendation.</p>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="section packages">
+  <div class="shell">
+    <div class="section-head" appReveal>
+      <div class="section-head__copy">
+        <span class="eyebrow">Signature packages</span>
+        <h2>One booking.<br /><em>The whole morning handled.</em></h2>
+        <p class="lede">
+          Everything from skin prep and hair styling to draping and a touch-up kit, bundled with a single,
+          transparent price.
+        </p>
+      </div>
+      <div class="section-head__actions">
+        <a routerLink="/packages" class="link-arrow">Compare packages <app-icon name="arrow-right" [size]="14" /></a>
+      </div>
+    </div>
+
+    <div class="packages__grid">
+      @for (item of packages(); track item.id; let i = $index) {
+        <div appReveal [revealDelay]="i * 90">
+          <app-package-card [item]="item" />
+        </div>
+      } @empty {
+        <p class="muted">Package details are being updated by the studio.</p>
+      }
+    </div>
+
+    <div class="packages__note" appReveal>
+      <app-icon name="info" [size]="16" />
+      <p>
+        Travel within Bengaluru is included for bridal packages. Outstation and multi-day events are quoted
+        separately — share your dates and we will build the plan around you.
+      </p>
+      <a routerLink="/booking" class="btn btn--dark btn--sm">Check my date</a>
+    </div>
+  </div>
+</section>
+
+<section class="section portfolio">
+  <div class="shell">
+    <div class="section-head" appReveal>
+      <div class="section-head__copy">
+        <span class="eyebrow">The portfolio</span>
+        <h2>Real skin.<br /><em>Real light. Real love.</em></h2>
+      </div>
+      <div class="section-head__actions">
+        <a routerLink="/portfolio" class="link-arrow">Open the full gallery <app-icon name="arrow-right" [size]="14" /></a>
+      </div>
+    </div>
+
+    <div class="portfolio__mosaic">
+      @for (item of portfolio(); track item.id; let i = $index) {
+        <div class="portfolio__tile" [class.portfolio__tile--wide]="i === 1 || i === 4" [class.portfolio__tile--tall]="i === 2" appReveal [revealDelay]="i * 70">
+          <app-portfolio-card [item]="item" (open)="openPortfolio($event)" />
+        </div>
+      } @empty {
+        <p class="muted">The gallery is being curated.</p>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="section section--cream shop">
+  <div class="shell">
+    <div class="section-head" appReveal>
+      <div class="section-head__copy">
+        <span class="eyebrow">The studio edit</span>
+        <h2>What lives<br /><em>on our tray.</em></h2>
+        <p class="lede">
+          The products our artists actually reach for — chosen for real skin, tested through long days, and
+          available to take home.
+        </p>
+      </div>
+      <div class="section-head__actions">
+        <a routerLink="/products" class="link-arrow">Shop the full edit <app-icon name="arrow-right" [size]="14" /></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="shell">
+    <app-horizontal-rail label="products">
+      @for (product of featuredProducts(); track product.id) {
+        <div class="rail-item rail-item--product">
+          <app-product-card [product]="product" />
+        </div>
+      } @empty {
+        <p class="muted">The shop is being restocked.</p>
+      }
+    </app-horizontal-rail>
+  </div>
+</section>
+
+@if (offers().length) {
+  <section class="section offers">
+    <div class="shell offers__grid">
+      <article class="offers__spotlight" appReveal>
+        <img [src]="offers()[0].imageUrl || '/media/seed/package-1.jpg'" [alt]="offers()[0].title" appImgFallback />
+        <div class="offers__spotlight-shade" aria-hidden="true"></div>
+        <div class="offers__spotlight-copy">
+          <span class="eyebrow eyebrow--light">A little extra</span>
+          <h2>{{ offers()[0].title }}</h2>
+          <p>{{ offers()[0].subtitle }}</p>
+          <div class="offers__code">
+            <span>{{ offers()[0].code }}</span>
+            <button type="button" (click)="copyCode(offers()[0].code)">
+              <app-icon name="copy" [size]="13" /> Copy code
+            </button>
+          </div>
+          <a routerLink="/offers" class="btn btn--gold btn--sm">See every offer</a>
+        </div>
+      </article>
+
+      <div class="offers__list" appReveal [revealDelay]="140">
+        <span class="eyebrow">Running now</span>
+        <h2 class="offers__title">Small luxuries,<br /><em>kindly priced.</em></h2>
+        @for (offer of offers(); track offer.id; let i = $index) {
+          <a class="offers__row" routerLink="/offers">
+            <span class="offers__index">0{{ i + 1 }}</span>
+            <span class="offers__row-copy">
+              <strong>{{ offer.title }}</strong>
+              <small>{{ offer.subtitle }}</small>
+            </span>
+            <span class="offers__badge">
+              @if (offer.discountType === 'Percentage') {
+                −{{ offer.discountValue }}%
+              } @else {
+                {{ offer.discountValue | inr }} off
+              }
+            </span>
+            <app-icon name="arrow-up-right" [size]="15" />
+          </a>
+        }
+        <a routerLink="/combos" class="link-arrow offers__link">
+          Browse curated combos <app-icon name="arrow-right" [size]="14" />
+        </a>
+      </div>
+    </div>
+  </section>
+}
+
+<section class="section vlogs">
+  <div class="shell">
+    <div class="section-head" appReveal>
+      <div class="section-head__copy">
+        <span class="eyebrow">The studio channel</span>
+        <h2>Watch the artistry<br /><em>unfold.</em></h2>
+        <p class="lede">
+          Bridal mornings, five-minute routines, influencer conversations and the quiet in-between moments of
+          studio life.
+        </p>
+      </div>
+      <div class="section-head__actions">
+        <a routerLink="/vlogs" class="link-arrow">All vlogs <app-icon name="arrow-right" [size]="14" /></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="shell">
+    <app-horizontal-rail label="vlogs">
+      @for (vlog of vlogs(); track vlog.id) {
+        <div class="rail-item rail-item--vlog">
+          <app-vlog-card [item]="vlog" (play)="openVlog($event)" />
+        </div>
+      } @empty {
+        <p class="muted">New films are in the edit suite.</p>
+      }
+    </app-horizontal-rail>
+  </div>
+</section>
+
+<section class="section section--dark love">
+  <div class="shell">
+    <div class="section-head love__head" appReveal>
+      <div class="section-head__copy">
+        <span class="eyebrow eyebrow--light">Love notes</span>
+        <h2>What they remember<br /><em>is how they felt.</em></h2>
+      </div>
+      <div class="section-head__actions">
+        <a routerLink="/testimonials" class="link-arrow">Read all notes <app-icon name="arrow-right" [size]="14" /></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="shell">
+    <app-horizontal-rail label="testimonials">
+      @for (item of testimonials(); track item.id) {
+        <div class="rail-item rail-item--testimonial">
+          <app-testimonial-card [item]="item" [dark]="true" (play)="openTestimonial($event)" />
+        </div>
+      } @empty {
+        <p class="muted">Love notes are on their way.</p>
+      }
+    </app-horizontal-rail>
+  </div>
+</section>
+
+<section class="section faq">
+  <div class="shell faq__grid">
+    <div class="faq__intro" appReveal>
+      <span class="eyebrow">Before you book</span>
+      <h2>The little<br /><em>details.</em></h2>
+      <p class="lede">
+        Everything you might want to know about trials, travel, timings and payment. Still curious? The studio
+        replies personally, usually within a day.
+      </p>
+      <div class="faq__contact-card">
+        <span class="faq__contact-icon"><app-icon name="message" [size]="18" /></span>
+        <div>
+          <strong>Ask us anything</strong>
+          <p>WhatsApp the studio or raise a support ticket.</p>
+        </div>
+        <a routerLink="/support" class="btn btn--dark btn--sm">Support</a>
+      </div>
+      <a routerLink="/faq" class="link-arrow">Read the full FAQ <app-icon name="arrow-right" [size]="14" /></a>
+    </div>
+
+    <div class="faq__list" appReveal [revealDelay]="140">
+      @for (item of faqs(); track item.id; let i = $index) {
+        <article class="faq__item" [class.is-open]="faqOpen() === i">
+          <button type="button" class="faq__question" (click)="toggleFaq(i)" [attr.aria-expanded]="faqOpen() === i">
+            <span class="faq__index">{{ (i + 1).toString().padStart(2, '0') }}</span>
+            <span>{{ item.question }}</span>
+            <app-icon [name]="faqOpen() === i ? 'minus' : 'plus'" [size]="16" />
+          </button>
+          @if (faqOpen() === i) {
+            <p class="faq__answer">{{ item.answer }}</p>
+          }
+        </article>
+      } @empty {
+        <p class="muted">Questions and answers are being prepared.</p>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="booking-band" appReveal>
+  <div class="booking-band__media" aria-hidden="true">
+    <img src="/media/seed/hero-bg-3.jpg" alt="" appImgFallback />
+  </div>
+  <div class="shell booking-band__inner">
+    <div class="booking-band__copy">
+      <span class="eyebrow eyebrow--light">The chair is yours</span>
+      <h2>Let’s plan the morning<br /><em>you’ll talk about for years.</em></h2>
+      <p>
+        Share your date and occasion, and we’ll come back with the artist, the timing and a look plan built
+        around you — no pressure, no obligation.
+      </p>
+      <div class="booking-band__actions">
+        <a routerLink="/booking" class="btn btn--gold">Book an appointment</a>
+        <a routerLink="/contact" class="btn btn--ghost-light">Visit the studio</a>
+      </div>
+    </div>
+    <div class="booking-band__card">
+      <span class="booking-band__card-label">Studio hours</span>
+      <p>{{ site.settings().businessHours }}</p>
+      <span class="rule"></span>
+      <a [href]="'tel:' + site.settings().phone"><app-icon name="phone" [size]="15" /> {{ site.settings().phone }}</a>
+      <a [href]="'mailto:' + site.settings().email"><app-icon name="mail" [size]="15" /> {{ site.settings().email }}</a>
+      <span class="booking-band__address">
+        <app-icon name="map-pin" [size]="15" />
+        {{ site.settings().addressLine1 }}, {{ site.settings().city }}
+      </span>
+    </div>
+  </div>
+</section>
+
+@if (lightbox(); as item) {
+  <app-media-lightbox [item]="item" (close)="lightbox.set(null)" />
+}

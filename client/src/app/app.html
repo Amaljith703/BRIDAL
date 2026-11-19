@@ -1,0 +1,10 @@
+<router-outlet />
+<app-toast-host />
+
+@if (showGate()) {
+  <app-music-gate />
+}
+
+@if (music.enabled() && !music.gateOpen()) {
+  <app-music-player />
+}

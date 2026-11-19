@@ -1,0 +1,90 @@
+<app-page-hero
+  eyebrow="The portfolio"
+  title="Real skin. Real light. Real love."
+  subtitle="A living gallery of brides, editorials, lessons and quiet studio moments. Tap any image to see it full-screen — most stories include a note on the look and the skin behind it."
+  imageUrl="/media/seed/portfolio-4.jpg"
+  [crumbs]="[{ label: 'Home', url: '/' }, { label: 'Portfolio' }]"
+>
+  <a routerLink="/booking" class="btn btn--gold">Book your look</a>
+  <a routerLink="/testimonials" class="btn btn--ghost-light">Read love notes</a>
+</app-page-hero>
+
+<section class="section portfolio">
+  <div class="shell">
+    <div class="portfolio__head" appReveal>
+      <div class="section-head__copy">
+        <span class="eyebrow">Selected work</span>
+        <h2>{{ total() }} looks,<br /><em>each one someone’s day.</em></h2>
+      </div>
+      <p class="portfolio__note">
+        Every face here is a real client, photographed in real light. We never retouch skin into someone else’s
+        idea of perfect — only into the best version of yours.
+      </p>
+    </div>
+
+    <div class="portfolio__filters" appReveal>
+      @for (entry of categories(); track entry) {
+        <button type="button" class="chip" [class.is-active]="entry === category()" (click)="setCategory(entry)">
+          {{ entry }}
+        </button>
+      }
+    </div>
+
+    @if (loading()) {
+      <div class="portfolio__mosaic">
+        @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+          <div class="skeleton portfolio__skeleton"></div>
+        }
+      </div>
+    } @else if (filtered().length) {
+      <div class="portfolio__mosaic">
+        @for (item of filtered(); track item.id; let i = $index) {
+          <button
+            type="button"
+            class="portfolio__tile"
+            [class.portfolio__tile--wide]="isWide(i)"
+            [class.portfolio__tile--tall]="isTall(i)"
+            (click)="open(item)"
+            appReveal
+            [revealDelay]="(i % 6) * 60"
+          >
+            <img [src]="item.imageUrl" [alt]="item.title" loading="lazy" appImgFallback />
+            <span class="portfolio__shade" aria-hidden="true"></span>
+            <span class="portfolio__caption">
+              <small>{{ item.category }}</small>
+              <strong>{{ item.title }}</strong>
+              @if (item.videoUrl) {
+                <span class="portfolio__play"><app-icon name="play" [size]="13" /> Watch the film</span>
+              }
+            </span>
+            <span class="portfolio__zoom"><app-icon name="external" [size]="15" /></span>
+          </button>
+        }
+      </div>
+    } @else {
+      <div class="empty-state">
+        <app-icon name="image" [size]="28" />
+        <h3>Nothing in this collection yet</h3>
+        <p>Try another category — or ask the studio for recent work in the look you have in mind.</p>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="portfolio-cta">
+  <div class="shell portfolio-cta__inner" appReveal>
+    <div>
+      <span class="eyebrow eyebrow--light">Your turn</span>
+      <h2>Let’s make something<br /><em>worth framing.</em></h2>
+      <p>Tell us the occasion and we will share recent work in that style, plus a look plan for your features.</p>
+    </div>
+    <div class="portfolio-cta__actions">
+      <a routerLink="/booking" class="btn btn--gold">Check my date</a>
+      <a routerLink="/contact" class="btn btn--ghost-light">Visit the studio</a>
+    </div>
+  </div>
+</section>
+
+@if (lightbox(); as item) {
+  <app-media-lightbox [item]="item" (close)="lightbox.set(null)" />
+}
